@@ -38,8 +38,15 @@ async function apiFetch(endpoint, options = {}) {
     if (response.status === 401) {
       Auth.removeToken();
       Auth.removeUser();
-      if (!window.location.pathname.includes('index')) {
-        window.location.href = '/index.html';
+      
+      const isPagesDir = window.location.pathname.includes('/pages/');
+      const indexPath = isPagesDir ? '../index.html' : 'index.html';
+      
+      // Solo recargar si ya estamos en index.html, de lo contrario ir allá
+      if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+        window.location.reload();
+      } else {
+        window.location.href = indexPath;
       }
     }
     throw new Error(data.message || `Error ${response.status}`);

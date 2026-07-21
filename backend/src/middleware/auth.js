@@ -20,7 +20,8 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'clave-secreta-inventariopro-12345';
+    const decoded = jwt.verify(token, secret);
     const usuario = await User.findById(decoded.id).select('-password');
 
     if (!usuario || !usuario.activo) {
