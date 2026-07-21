@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conduce de Salida</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background: #f4f4f4;
+    }
+    .print-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 40px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid #333;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+    .header-logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0ea5e9; /* primary-color */
+    }
+    .header-info {
+      text-align: right;
+    }
+    .header-info h1 {
+      margin: 0 0 5px 0;
+      font-size: 28px;
+      text-transform: uppercase;
+      color: #333;
+    }
+    .details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+    .details div {
+      width: 48%;
+    }
+    .details strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #666;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+    .details p {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th {
+      background: #f8fafc;
+      color: #333;
+      padding: 12px;
+      text-align: left;
+      border-bottom: 2px solid #cbd5e1;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 15px;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .footer {
+      margin-top: 60px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .signature-box {
+      width: 40%;
+      text-align: center;
+      margin-top: 40px;
+    }
+    .signature-line {
+      border-top: 1px solid #333;
+      padding-top: 10px;
+      margin-bottom: 5px;
+    }
+    .total-row {
+      font-weight: bold;
+      background: #f8fafc;
+    }
+    /* Botón de imprimir (oculto al imprimir) */
+    .print-btn-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .btn-print {
+      background: #0ea5e9;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-print:hover {
+      background: #0284c7;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+      .print-container {
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        max-width: 100%;
+      }
+      .print-btn-container {
+        display: none;
+      }
+      @page {
+        margin: 1.5cm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-btn-container">
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir Conduce</button>
+  </div>
+
+  <div class="print-container">
+    <div class="header">
+      <div class="header-logo">
+        📦 InventarioPro
+      </div>
+      <div class="header-info">
+        <h1>Conduce de Salida</h1>
+        <p><strong>Nº Documento:</strong> <span id="doc-num">Cargando...</span></p>
+        <p><strong>Fecha:</strong> <span id="doc-date">Cargando...</span></p>
+      </div>
+    </div>
+
+    <div class="details">
+      <div>
+        <strong>Cliente / Destino:</strong>
+        <p id="cliente-name">Cargando...</p>
+        
+        <strong>Dirección:</strong>
+        <p id="doc-direccion">-</p>
+
+        <strong>Técnico / Empleado:</strong>
+        <p id="doc-empleado">-</p>
+      </div>
+      <div>
+        <strong>Orden de Servicio:</strong>
+        <p id="doc-orden">-</p>
+        
+        <strong>Brigada / Placa:</strong>
+        <p id="doc-brigada-placa">-</p>
+
+        <strong>Tipo de Trabajo:</strong>
+        <p id="doc-tipo">-</p>
+      </div>
+    </div>
+    <div style="margin-bottom: 20px;">
+      <strong>Notas / Observaciones:</strong>
+      <p id="doc-notes" style="margin: 5px 0 0 0; font-size: 15px;">-</p>
+    </div>
+
+    <table id="items-table">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Descripción del Producto</th>
+          <th class="text-center">Cant.</th>
+        </tr>
+      </thead>
+      <tbody id="items-body">
+        <tr><td colspan="3" class="text-center">Cargando productos...</td></tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="2" class="text-right">TOTAL UNIDADES:</td>
+          <td class="text-center" id="total-qty">0</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="footer">
+      <div class="signature-box">
+        <div class="signature-line"></div>
+        <strong>Firma Despacho (Almacén)</strong>
+      </div>
+      <div class="signature-box">
+        <div class="signature-line"></div>
+        <strong>Firma Recibe (Cliente / Chofer)</strong>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const conduceId = urlParams.get('id');
+      
+      if (!conduceId) {
+        alert('ID de conduce no proporcionado');
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '../index.html';
+            return;
+        }
+
+        const res = await fetch(`http://localhost:3000/api/dispatch/${conduceId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (!data.success) {
+          alert('Error: ' + data.message);
+          return;
+        }
+
+        const c = data.data;
+
+        // Llenar datos
+        document.getElementById('doc-num').textContent = c.numero_conduce;
+        document.getElementById('doc-date').textContent = new Date(c.createdAt).toLocaleString();
+        document.getElementById('cliente-name').textContent = c.cliente || 'N/A';
+        document.getElementById('doc-direccion').textContent = c.direccion || 'N/A';
+        document.getElementById('doc-empleado').textContent = c.empleado || 'N/A';
+        document.getElementById('doc-orden').textContent = c.orden_servicio || 'N/A';
+        document.getElementById('doc-brigada-placa').textContent = `${c.brigada || 'N/A'} / ${c.placa || 'N/A'}`;
+        document.getElementById('doc-tipo').textContent = c.tipo_trabajo || 'N/A';
+        document.getElementById('doc-notes').textContent = c.notas || '-';
+
+        // Llenar tabla
+        const tbody = document.getElementById('items-body');
+        tbody.innerHTML = '';
+        
+        let totalQty = 0;
+
+        if (!c.items || c.items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center">No hay productos registrados en esta salida</td></tr>';
+        } else {
+            c.items.forEach(item => {
+            totalQty += item.cantidad;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="font-family:monospace; color:#666;">${item.producto?.sku || 'N/A'}</td>
+                <td><strong>${item.producto?.nombre || 'Producto Desconocido'}</strong></td>
+                <td class="text-center"><strong>${item.cantidad}</strong></td>
+            `;
+            tbody.appendChild(row);
+            });
+        }
+
+        document.getElementById('total-qty').textContent = totalQty;
+
+        // Opcional: auto-imprimir cuando cargue todo
+        // setTimeout(() => window.print(), 500);
+
+      } catch (err) {
+        console.error('Error cargando conduce:', err);
+        alert('Error conectando con el servidor.');
+      }
+    });
+  </script>
+</body>
+</html>

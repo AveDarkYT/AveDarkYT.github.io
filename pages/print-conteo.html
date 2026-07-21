@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hoja de Conteo Físico</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #000;
+      background: #fff;
+    }
+    .print-container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      text-transform: uppercase;
+    }
+    .header-info {
+      text-align: right;
+      font-size: 14px;
+    }
+    .header-info p {
+      margin: 2px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th {
+      background: #eee;
+      color: #000;
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #000;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 10px;
+      border: 1px solid #000;
+      font-size: 13px;
+    }
+    .text-center { text-align: center; }
+    
+    .count-line {
+      display: inline-block;
+      width: 100%;
+      border-bottom: 1px solid #000;
+      height: 20px;
+    }
+    
+    .category-row {
+      background-color: #f9f9f9;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* Ocultar botones al imprimir */
+    .print-btn-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .btn-print {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    @media print {
+      .print-btn-container { display: none; }
+      body { background: #fff; }
+      .print-container { margin: 0; padding: 0; max-width: 100%; }
+      @page { margin: 1.5cm; }
+      /* Evitar que las filas se corten a la mitad */
+      tr { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-btn-container">
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir Hoja de Conteo</button>
+  </div>
+
+  <div class="print-container">
+    <div class="header">
+      <div>
+        <h1>Toma de Inventario Físico</h1>
+        <p style="margin-top:5px; font-weight:bold;">Almacén Principal</p>
+      </div>
+      <div class="header-info">
+        <p><strong>Fecha:</strong> <span id="doc-date">...</span></p>
+        <p><strong>Contador Por:</strong> _______________________</p>
+        <p><strong>Revisado Por:</strong> _______________________</p>
+      </div>
+    </div>
+
+    <table id="inventory-table">
+      <thead>
+        <tr>
+          <th style="width: 15%;">SKU</th>
+          <th style="width: 35%;">Descripción del Producto</th>
+          <th style="width: 25%;">Ubicación</th>
+          <th style="width: 25%;" class="text-center">Conteo Físico</th>
+        </tr>
+      </thead>
+      <tbody id="inventory-body">
+        <tr><td colspan="4" class="text-center">Cargando inventario...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('doc-date').textContent = new Date().toLocaleDateString();
+
+      try {
+        const res = await apiFetch('/inventory?limit=1000');
+        if (!res.success) return;
+
+        const items = res.data;
+        const tbody = document.getElementById('inventory-body');
+        tbody.innerHTML = '';
+        
+        // Agrupar por categoría
+        const grouped = {};
+        items.forEach(item => {
+          const catName = item.producto.categoria?.nombre || 'Sin Categoría';
+          if (!grouped[catName]) grouped[catName] = [];
+          grouped[catName].push(item);
+        });
+
+        // Renderizar tabla
+        for (const [catName, products] of Object.entries(grouped)) {
+          // Fila de Categoría
+          tbody.innerHTML += `
+            <tr class="category-row">
+              <td colspan="4">📁 ${catName}</td>
+            </tr>
+          `;
+          
+          // Filas de productos
+          products.forEach(p => {
+            const prod = p.producto;
+            const ub = prod.ubicacion;
+            const ubicacionTexto = ub 
+              ? (ub.descripcion_completa || `${ub.pasillo || ''}-${ub.estante || ''}-${ub.nivel || ''}`).replace(/^-|-$/g, '') 
+              : '';
+
+            tbody.innerHTML += `
+              <tr>
+                <td style="font-family:monospace;">${prod.sku}</td>
+                <td><strong>${prod.nombre}</strong></td>
+                <td>${ubicacionTexto || '-'}</td>
+                <td class="text-center"><span class="count-line"></span></td>
+              </tr>
+            `;
+          });
+        }
+      } catch (err) {
+        console.error('Error cargando inventario:', err);
+        document.getElementById('inventory-body').innerHTML = `<tr><td colspan="4" class="text-center">Error al cargar datos.</td></tr>`;
+      }
+    });
+  </script>
+</body>
+</html>

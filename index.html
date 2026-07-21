@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de Control de Inventario de Almacén - Dashboard Principal">
+  <title>InventarioPro | Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <style>
+    .chart-container { position: relative; height: 240px; }
+    .scanner-input-wrap {
+      display: flex; gap: 10px; align-items: center;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 12px; padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+    .scanner-input-wrap input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text-primary); font-size: 16px; font-family: monospace;
+    }
+    .scanner-input-wrap .scan-icon { color: var(--accent-blue); font-size: 22px; }
+    .activity-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .activity-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .activity-icon.entrada { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+    .activity-icon.salida  { background: rgba(239,68,68,0.15);  color: var(--accent-red); }
+    .activity-icon.ajuste  { background: rgba(245,158,11,0.15); color: var(--accent-yellow); }
+  </style>
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container" role="alert" aria-live="polite"></div>
+
+<div class="app-layout">
+
+  <!-- ══ SIDEBAR ═══════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menú principal">
+
+    <div class="sidebar-logo">
+      <div class="logo-icon">📦</div>
+      <div>
+        <h1>InventarioPro</h1>
+        <span>Sistema de Almacén v1.0</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <a href="index.html"              class="nav-item active" id="nav-dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="pages/productos.html"   class="nav-item" id="nav-productos">
+        <span class="nav-icon">📦</span> Productos
+      </a>
+      <a href="pages/movimientos.html" class="nav-item" id="nav-movimientos">
+        <span class="nav-icon">🔄</span> Movimientos
+      </a>
+      <a href="pages/conduces.html" class="nav-item" id="nav-conduces">
+        <span class="nav-icon">📄</span> Conduces
+      </a>
+
+      <p class="nav-section-title">Operaciones</p>
+      <a href="pages/scanner.html" class="nav-item" id="nav-scanner">
+        <span class="nav-icon">📡</span> Escáner
+      </a>
+      <a href="pages/conteo.html" class="nav-item" id="nav-conteo">
+        <span class="nav-icon">📝</span> Conteo Físico
+      </a>
+      <a href="pages/alertas.html" class="nav-item" id="nav-alertas">
+        <span class="nav-icon">🔔</span> Alertas
+        <span class="nav-badge" id="alert-badge" style="display:none">0</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div class="user-info">
+          <strong id="user-name">Cargando...</strong>
+          <small id="user-rol">-</small>
+        </div>
+      </div>
+      <button class="btn btn-ghost w-full mt-4" id="btn-logout" style="justify-content:center; gap:8px">
+        <i class="fa fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══ CONTENIDO PRINCIPAL ═══════════════════════════ -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-title">
+        <h2>Dashboard</h2>
+        <p id="current-date">Cargando fecha...</p>
+      </div>
+      <div class="topbar-actions">
+        <div class="search-bar" role="search">
+          <i class="fa fa-search" style="color:var(--text-muted)"></i>
+          <input type="text" id="global-search" placeholder="Buscar producto, SKU..." aria-label="Buscar">
+        </div>
+        <div class="connection-status" id="conn-status" title="Estado de conexión">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="status-text">Conectado</span>
+        </div>
+        <button class="btn-icon" title="Actualizar dashboard" id="btn-refresh">
+          <i class="fa fa-sync-alt"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Contenido -->
+    <div class="page-content">
+
+      <!-- ── Barra de Escáner Rápido ─────────────────── -->
+      <div class="scanner-input-wrap">
+        <i class="fa fa-barcode scan-icon"></i>
+        <input
+          type="text"
+          id="quick-scan-input"
+          placeholder="Escanea un código de barras aquí... (Enter para registrar salida)"
+          aria-label="Escaneo rápido de código de barras"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <select id="quick-scan-tipo" class="form-control" style="width:auto; padding:6px 10px">
+          <option value="salida">📤 Salida</option>
+          <option value="entrada">📥 Entrada</option>
+        </select>
+        <span id="scan-feedback" style="font-size:13px; color:var(--text-muted); min-width:80px;"></span>
+      </div>
+
+      <!-- ── KPI Cards ───────────────────────────────── -->
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card blue">
+          <div class="kpi-header">
+            <div class="kpi-label">Total Productos</div>
+            <div class="kpi-icon" aria-hidden="true">📦</div>
+          </div>
+          <div class="kpi-value" id="kpi-total-productos">–</div>
+          <div class="kpi-footer">
+            <span class="kpi-badge up" id="kpi-productos-activos">0 activos</span>
+          </div>
+        </div>
+
+        <div class="kpi-card green">
+          <div class="kpi-header">
+            <div class="kpi-label">Unidades en Stock</div>
+            <div class="kpi-icon" aria-hidden="true">🏭</div>
+          </div>
+          <div class="kpi-value" id="kpi-total-unidades">–</div>
+          <div class="kpi-footer">
+            <span class="kpi-badge up">Total disponible</span>
+          </div>
+        </div>
+
+        <div class="kpi-card yellow">
+          <div class="kpi-header">
+            <div class="kpi-label">Stock Bajo Reorden</div>
+            <div class="kpi-icon" aria-hidden="true">⚠️</div>
+          </div>
+          <div class="kpi-value" id="kpi-bajo-reorden" style="color:var(--accent-yellow)">–</div>
+          <div class="kpi-footer">
+            <span class="kpi-badge warn" id="kpi-criticos">0 críticos</span>
+          </div>
+        </div>
+
+        <div class="kpi-card red">
+          <div class="kpi-header">
+            <div class="kpi-label">Sin Stock</div>
+            <div class="kpi-icon" aria-hidden="true">⛔</div>
+          </div>
+          <div class="kpi-value" id="kpi-sin-stock" style="color:var(--accent-red)">–</div>
+          <div class="kpi-footer">
+            <span class="kpi-badge down">Requieren reabastecimiento</span>
+          </div>
+        </div>
+
+        <div class="kpi-card purple">
+          <div class="kpi-header">
+            <div class="kpi-label">Movimientos Hoy</div>
+            <div class="kpi-icon" aria-hidden="true">🔄</div>
+          </div>
+          <div class="kpi-value" id="kpi-movimientos-hoy">–</div>
+          <div class="kpi-footer">
+            <span id="kpi-salidas-hoy" style="font-size:12px; color:var(--text-muted)">0 salidas / 0 entradas</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Grid de contenido principal ────────────── -->
+      <div class="content-grid">
+
+        <!-- Panel izquierdo: Tabla de stock crítico + Gráfico -->
+        <div class="flex flex-col gap-4">
+
+          <!-- Tabla: Productos con stock crítico -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa fa-exclamation-triangle" style="color:var(--accent-yellow)"></i>
+                Productos que Requieren Atención
+              </div>
+              <a href="pages/productos.html" class="btn btn-ghost btn-sm">Ver todos</a>
+            </div>
+            <div class="card-body" style="padding: 0 0 8px 0">
+              <table class="data-table" id="low-stock-table" aria-label="Productos con stock bajo">
+                <thead>
+                  <tr>
+                    <th>Producto / SKU</th>
+                    <th>Ubicación</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="low-stock-tbody">
+                  <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:24px">
+                    <span class="spinner"></span>
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Gráfico de movimientos -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa fa-chart-bar" style="color:var(--accent-blue)"></i>
+                Movimientos de los Últimos 7 Días
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="movements-chart" aria-label="Gráfico de movimientos"></canvas>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Panel derecho: Alertas activas + Actividad reciente -->
+        <div class="flex flex-col gap-4">
+
+          <!-- Alertas activas -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa fa-bell" style="color:var(--accent-red)"></i>
+                Alertas Activas
+              </div>
+              <a href="pages/alertas.html" class="btn btn-ghost btn-sm">Ver todas</a>
+            </div>
+            <div class="card-body">
+              <div class="alert-list" id="alerts-list">
+                <div style="text-align:center; padding:20px">
+                  <span class="spinner"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actividad reciente -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa fa-history" style="color:var(--accent-cyan)"></i>
+                Actividad Reciente
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="activity-list">
+                <div style="text-align:center; padding:20px">
+                  <span class="spinner"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<!-- ══ LOGIN MODAL ════════════════════════════════════════ -->
+<div id="login-overlay" style="
+  display:none; position:fixed; inset:0; z-index:9998;
+  background:rgba(0,0,0,0.85); backdrop-filter:blur(10px);
+  display:flex; align-items:center; justify-content:center;
+" role="dialog" aria-modal="true" aria-label="Iniciar sesión">
+  <div style="
+    background:var(--bg-secondary); border:var(--glass-border);
+    border-radius:var(--radius-xl); padding:40px; width:380px;
+    box-shadow:var(--shadow-md); animation: fadeIn .3s ease;
+  ">
+    <div style="text-align:center; margin-bottom:28px">
+      <div style="font-size:44px; margin-bottom:12px">📦</div>
+      <h2 style="font-size:22px; font-weight:800">InventarioPro</h2>
+      <p style="color:var(--text-muted); font-size:14px; margin-top:6px">Sistema de Control de Almacén</p>
+    </div>
+    <form id="login-form" novalidate>
+      <div class="form-group mb-4">
+        <label class="form-label" for="login-email">Email</label>
+        <input type="email" id="login-email" class="form-control"
+          placeholder="admin@inventario.com" autocomplete="email" required>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label" for="login-password">Contraseña</label>
+        <input type="password" id="login-password" class="form-control"
+          placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-full" id="login-btn" style="justify-content:center">
+        <i class="fa fa-sign-in-alt"></i> Iniciar Sesión
+      </button>
+      <p style="text-align:center; color:var(--text-muted); font-size:12px; margin-top:16px">
+        Demo: admin@inventario.com / admin1234
+      </p>
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="register.html" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">¿No tienes cuenta? Regístrate aquí</a>
+      </div>
+    </form>
+    <div id="login-error" style="
+      display:none; margin-top:14px; padding:10px 14px;
+      background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
+      border-radius:8px; color:var(--accent-red); font-size:13px;
+    "></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/socket.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

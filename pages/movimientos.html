@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InventarioPro | Historial de Movimientos</title>
+  <meta name="description" content="Historial completo de movimientos de entrada y salida del almacén">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+<div class="toast-container" id="toast-container" role="alert" aria-live="polite"></div>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon">📦</div><div><h1>InventarioPro</h1><span>Sistema de Almacén</span></div></div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <a href="../index.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="productos.html" class="nav-item"><span class="nav-icon">📦</span> Productos</a>
+      <a href="movimientos.html" class="nav-item active"><span class="nav-icon">🔄</span> Movimientos</a>
+      <a href="conduces.html" class="nav-item"><span class="nav-icon">📄</span> Conduces</a>
+      <p class="nav-section-title">Operaciones</p>
+      <a href="scanner.html" class="nav-item"><span class="nav-icon">📡</span> Escáner</a>
+      <a href="conteo.html" class="nav-item"><span class="nav-icon">📝</span> Conteo Físico</a>
+      <a href="alertas.html" class="nav-item"><span class="nav-icon">🔔</span> Alertas
+        <span class="nav-badge" id="alert-badge" style="display:none">0</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card"><div class="user-avatar" id="user-avatar">A</div>
+        <div class="user-info"><strong id="user-name">-</strong><small id="user-rol">-</small></div></div>
+      <button class="btn btn-ghost w-full mt-4" id="btn-logout" style="justify-content:center">
+        <i class="fa fa-sign-out-alt"></i> Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-title"><h2>🔄 Historial de Movimientos</h2><p>Auditoría completa de entradas, salidas y ajustes</p></div>
+      <div class="topbar-actions">
+        <div class="connection-status" id="conn-status"><div class="status-dot" id="status-dot"></div><span id="status-text">Conectado</span></div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <!-- KPIs del día -->
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr); margin-bottom:20px" id="stats-grid">
+        <div class="kpi-card red"><div class="kpi-header"><div class="kpi-label">Salidas Hoy</div><div class="kpi-icon">📤</div></div><div class="kpi-value" id="stat-salidas">—</div></div>
+        <div class="kpi-card green"><div class="kpi-header"><div class="kpi-label">Entradas Hoy</div><div class="kpi-icon">📥</div></div><div class="kpi-value" id="stat-entradas">—</div></div>
+        <div class="kpi-card yellow"><div class="kpi-header"><div class="kpi-label">Ajustes Hoy</div><div class="kpi-icon">🔧</div></div><div class="kpi-value" id="stat-ajustes">—</div></div>
+        <div class="kpi-card blue"><div class="kpi-header"><div class="kpi-label">Total Hoy</div><div class="kpi-icon">🔄</div></div><div class="kpi-value" id="stat-total">—</div></div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-body">
+          <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto">
+            <div class="form-group">
+              <label class="form-label">Tipo de Movimiento</label>
+              <select class="form-control" id="filter-tipo">
+                <option value="">Todos</option>
+                <option value="salida">📤 Salida</option>
+                <option value="entrada">📥 Entrada</option>
+                <option value="ajuste">🔧 Ajuste</option>
+                <option value="devolucion">↩️ Devolución</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Desde</label>
+              <input type="date" class="form-control" id="filter-desde">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hasta</label>
+              <input type="date" class="form-control" id="filter-hasta">
+            </div>
+            <div class="form-group" style="justify-content:flex-end">
+              <label class="form-label" style="visibility:hidden">.</label>
+              <button class="btn btn-primary" id="btn-filter">
+                <i class="fa fa-search"></i> Filtrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de movimientos -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fa fa-history" style="color:var(--accent-cyan)"></i> Registro de Auditoría</div>
+          <span class="badge badge-info" id="total-mov-badge">-</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table" aria-label="Historial de movimientos">
+            <thead><tr>
+              <th>Fecha/Hora</th><th>Tipo</th><th>Producto</th>
+              <th>Cantidad</th><th>Stock Ant→Nuevo</th>
+              <th>Operador</th><th>Referencia</th><th>Vía</th>
+            </tr></thead>
+            <tbody id="movements-tbody"><tr><td colspan="8" style="text-align:center;padding:32px"><span class="spinner"></span></td></tr></tbody>
+          </table>
+        </div>
+        <!-- Paginación -->
+        <div style="padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-top:var(--glass-border)">
+          <span style="font-size:13px;color:var(--text-muted)" id="pagination-info">Página 1</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" id="btn-prev" disabled>← Anterior</button>
+            <button class="btn btn-ghost btn-sm" id="btn-next">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/socket.js"></script>
+<script>
+let currentPage = 1;
+const PAGE_SIZE = 25;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; return; }
+  const user = Auth.getUser();
+  if (user) {
+    document.getElementById('user-name').textContent = user.nombre;
+    document.getElementById('user-rol').textContent  = user.rol;
+    document.getElementById('user-avatar').textContent = (user.nombre||'U')[0].toUpperCase();
+  }
+
+  initSocket();
+  await updateAlertBadge();
+  loadStats();
+  loadMovements();
+
+  document.getElementById('btn-filter')?.addEventListener('click', () => { currentPage = 1; loadMovements(); });
+  document.getElementById('btn-prev')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadMovements(); }});
+  document.getElementById('btn-next')?.addEventListener('click', () => { currentPage++; loadMovements(); });
+  document.getElementById('btn-logout')?.addEventListener('click', () => { Auth.removeToken(); Auth.removeUser(); window.location.href = '../index.html'; });
+});
+
+async function loadStats() {
+  try {
+    const res = await API.getStats();
+    const s = res.data;
+    document.getElementById('stat-salidas').textContent  = s.salidas?.count  || 0;
+    document.getElementById('stat-entradas').textContent = s.entradas?.count || 0;
+    document.getElementById('stat-ajustes').textContent  = s.ajustes?.count  || 0;
+    const total = (s.salidas?.count||0) + (s.entradas?.count||0) + (s.ajustes?.count||0);
+    document.getElementById('stat-total').textContent = total;
+  } catch(e) {}
+}
+
+async function loadMovements() {
+  const tbody = document.getElementById('movements-tbody');
+  const tipo  = document.getElementById('filter-tipo')?.value  || '';
+  const desde = document.getElementById('filter-desde')?.value || '';
+  const hasta = document.getElementById('filter-hasta')?.value || '';
+
+  let params = `page=${currentPage}&limit=${PAGE_SIZE}`;
+  if (tipo)  params += `&tipo=${tipo}`;
+  if (desde) params += `&desde=${desde}`;
+  if (hasta) params += `&hasta=${hasta}`;
+
+  try {
+    const res = await API.getMovements(params);
+    const movs = res.data;
+    const pag  = res.paginacion;
+
+    document.getElementById('total-mov-badge').textContent = `${pag.total} movimientos`;
+    document.getElementById('pagination-info').textContent =
+      `Página ${pag.pagina} de ${pag.total_paginas} (${pag.total} total)`;
+    document.getElementById('btn-prev').disabled = pag.pagina <= 1;
+    document.getElementById('btn-next').disabled = !pag.tiene_mas;
+
+    if (!movs.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted)">No se encontraron movimientos</td></tr>`;
+      return;
+    }
+
+    const typeIcon  = { entrada:'📥', salida:'📤', ajuste:'🔧', devolucion:'↩️', transferencia:'🔀' };
+    const typeBadge = { entrada:'success', salida:'danger', ajuste:'warning', devolucion:'info' };
+
+    tbody.innerHTML = movs.map(m => `
+      <tr>
+        <td style="font-size:12px;white-space:nowrap">${new Date(m.createdAt).toLocaleString('es-ES')}</td>
+        <td><span class="badge badge-${typeBadge[m.tipo]||'info'}">${typeIcon[m.tipo]||'🔄'} ${m.tipo}</span></td>
+        <td>
+          <div style="font-weight:600;font-size:13px">${m.producto?.nombre||'—'}</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:monospace">${m.producto?.sku||''}</div>
+        </td>
+        <td style="font-weight:700;font-size:15px;color:${m.tipo==='salida'?'var(--accent-red)':'var(--accent-green)'}">${m.tipo==='salida'?'-':'+'}${m.cantidad}</td>
+        <td style="font-family:monospace;font-size:13px">${m.stock_anterior} → <strong>${m.stock_nuevo}</strong></td>
+        <td style="font-size:12px">${m.usuario?.nombre||'—'}</td>
+        <td style="font-size:11px;color:var(--text-muted)">${m.referencia?.numero||m.notas||'—'}</td>
+        <td>${m.via_scanner ? '<span class="badge badge-info">📡 Scanner</span>' : '<span class="badge" style="background:var(--bg-card);color:var(--text-muted)">⌨️ Manual</span>'}</td>
+      </tr>`).join('');
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--accent-red)">${err.message}</td></tr>`;
+  }
+}
+</script>
+</body>
+</html>

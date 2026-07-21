@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InventarioPro | Alertas de Stock</title>
+  <meta name="description" content="Alertas automáticas de reorden de inventario del almacén">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+<div class="toast-container" id="toast-container" role="alert" aria-live="polite"></div>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon">📦</div><div><h1>InventarioPro</h1><span>Sistema de Almacén</span></div></div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <a href="../index.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="productos.html" class="nav-item"><span class="nav-icon">📦</span> Productos</a>
+      <a href="movimientos.html" class="nav-item"><span class="nav-icon">🔄</span> Movimientos</a>
+      <a href="conduces.html" class="nav-item"><span class="nav-icon">📄</span> Conduces</a>
+      <p class="nav-section-title">Operaciones</p>
+      <a href="scanner.html" class="nav-item"><span class="nav-icon">📡</span> Escáner</a>
+      <a href="conteo.html" class="nav-item"><span class="nav-icon">📝</span> Conteo Físico</a>
+      <a href="alertas.html" class="nav-item active"><span class="nav-icon">🔔</span> Alertas
+        <span class="nav-badge" id="alert-badge" style="display:none">0</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card"><div class="user-avatar" id="user-avatar">A</div>
+        <div class="user-info"><strong id="user-name">-</strong><small id="user-rol">-</small></div></div>
+      <button class="btn btn-ghost w-full mt-4" id="btn-logout" style="justify-content:center">
+        <i class="fa fa-sign-out-alt"></i> Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-title"><h2>🔔 Alertas de Stock</h2>
+        <p>Alertas automáticas generadas cuando el stock alcanza el punto de reorden</p></div>
+      <div class="topbar-actions">
+        <div class="connection-status" id="conn-status"><div class="status-dot" id="status-dot"></div><span id="status-text">Conectado</span></div>
+        <button class="btn btn-ghost btn-sm" id="btn-mark-all">
+          <i class="fa fa-check-double"></i> Marcar todas leídas</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <!-- Filtros -->
+      <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm filter-btn active" data-filter="">Todas</button>
+        <button class="btn btn-ghost btn-sm filter-btn" data-filter="leida=false">Sin leer</button>
+        <button class="btn btn-ghost btn-sm filter-btn" data-filter="resuelta=false">Pendientes</button>
+        <button class="btn btn-ghost btn-sm filter-btn" data-filter="resuelta=true">Resueltas</button>
+      </div>
+
+      <!-- Tabla de alertas -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fa fa-bell" style="color:var(--accent-red)"></i> Registro de Alertas</div>
+          <span class="badge badge-danger" id="total-badge">0</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table" aria-label="Tabla de alertas de inventario">
+            <thead><tr>
+              <th>Tipo</th><th>Producto</th><th>Stock / Reorden</th>
+              <th>Mensaje</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
+            </tr></thead>
+            <tbody id="alerts-tbody"><tr><td colspan="7" style="text-align:center;padding:32px">
+              <span class="spinner"></span></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/socket.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; return; }
+  const user = Auth.getUser();
+  if (user) {
+    document.getElementById('user-name').textContent = user.nombre;
+    document.getElementById('user-rol').textContent  = user.rol;
+    document.getElementById('user-avatar').textContent = (user.nombre||'U')[0].toUpperCase();
+  }
+  initSocket();
+  await updateAlertBadge();
+  loadAlertas();
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'btn-primary'));
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.add('btn-ghost'));
+      btn.classList.add('active', 'btn-primary');
+      btn.classList.remove('btn-ghost');
+      loadAlertas(btn.dataset.filter);
+    });
+  });
+
+  document.getElementById('btn-mark-all')?.addEventListener('click', async () => {
+    const { data } = await API.getAlerts('leida=false');
+    await Promise.all(data.map(a => API.marcarLeida(a._id)));
+    showToast('success', 'Listo', 'Todas las alertas marcadas como leídas');
+    loadAlertas();
+    updateAlertBadge();
+  });
+
+  document.getElementById('btn-logout')?.addEventListener('click', () => {
+    Auth.removeToken(); Auth.removeUser(); window.location.href = '../index.html';
+  });
+});
+
+async function loadAlertas(params = '') {
+  const tbody = document.getElementById('alerts-tbody');
+  try {
+    const res = await API.getAlerts(params + '&limit=50');
+    const alertas = res.data;
+    document.getElementById('total-badge').textContent = res.total || alertas.length;
+
+    if (!alertas.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted)">✅ No hay alertas para los filtros seleccionados</td></tr>`;
+      return;
+    }
+
+    const icons = { sin_stock:'⛔', stock_critico:'🔴', stock_bajo:'🟡', sobrestock:'🔵' };
+    const labels = { sin_stock:'Sin Stock', stock_critico:'Crítico', stock_bajo:'Stock Bajo', sobrestock:'Sobrestock' };
+    const badges = { sin_stock:'danger', stock_critico:'danger', stock_bajo:'warning', sobrestock:'info' };
+
+    tbody.innerHTML = alertas.map(a => `
+      <tr data-id="${a._id}" style="opacity:${a.resuelta ? 0.5 : 1}">
+        <td><span class="badge badge-${badges[a.tipo]||'info'}">${icons[a.tipo]||'⚠️'} ${labels[a.tipo]||a.tipo}</span></td>
+        <td>
+          <div style="font-weight:600">${a.producto?.nombre||'—'}</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:monospace">${a.producto?.sku||''}</div>
+        </td>
+        <td>
+          <span style="font-weight:700;font-size:15px;color:${a.stock_actual===0?'var(--accent-red)':'var(--accent-yellow)'}">${a.stock_actual}</span>
+          <span style="color:var(--text-muted)"> / ${a.punto_reorden}</span>
+        </td>
+        <td style="font-size:12px;max-width:240px">${a.mensaje}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${new Date(a.createdAt).toLocaleString('es-ES')}</td>
+        <td>${a.resuelta ? '<span class="badge badge-success">✅ Resuelta</span>' :
+            a.leida    ? '<span class="badge badge-info">👁 Leída</span>'    :
+                         '<span class="badge badge-danger">🔴 Nueva</span>'}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            ${!a.leida    ? `<button class="btn btn-ghost btn-sm" onclick="markRead('${a._id}')">Leer</button>` : ''}
+            ${!a.resuelta ? `<button class="btn btn-success btn-sm" onclick="resolve('${a._id}')">Resolver</button>` : ''}
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--accent-red)">${err.message}</td></tr>`;
+  }
+}
+
+async function markRead(id) {
+  await API.marcarLeida(id);
+  showToast('info', 'Alerta marcada como leída', '');
+  loadAlertas();
+  updateAlertBadge();
+}
+
+async function resolve(id) {
+  await API.resolverAlerta(id);
+  showToast('success', 'Alerta resuelta', 'Se marcó como resuelta');
+  loadAlertas();
+  updateAlertBadge();
+}
+</script>
+</body>
+</html>
