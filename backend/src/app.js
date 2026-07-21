@@ -18,6 +18,9 @@ const alertRoutes     = require('./routes/alerts');
 const dispatchRoutes  = require('./routes/dispatch');
 const orderRoutes     = require('./routes/orders');
 const entityRoutes    = require('./routes/entities');
+const categoryRoutes  = require('./routes/categories');
+const brandRoutes     = require('./routes/brands');
+const unitRoutes      = require('./routes/units');
 
 const app = express();
 
@@ -66,7 +69,9 @@ app.use('/api/alerts',    alertRoutes);
 app.use('/api/dispatch',  dispatchRoutes);
 app.use('/api/orders',    orderRoutes);
 app.use('/api/entities',  entityRoutes);
-app.use('/api/categories', require('./routes/categories'));
+app.use('/api/categories',categoryRoutes);
+app.use('/api/brands',    brandRoutes);
+app.use('/api/units',     unitRoutes);
 app.use('/api/imports',   require('./routes/imports'));
 app.use('/api/transfers', require('./routes/transfers'));
 

@@ -8,21 +8,18 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     .alert-card {
-      background: var(--surface);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 16px;
+      background: var(--surface-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      border-left: 4px solid var(--primary-color);
       display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
-      position: relative;
-      overflow: hidden;
+      justify-content: space-between;
+      align-items: center;
     }
-    .alert-card.critical { border-left: 4px solid var(--accent-red); }
-    .alert-card.warning { border-left: 4px solid var(--accent-yellow); }
-    .alert-icon { font-size: 32px; align-self: center; }
-    .critical .alert-icon { color: var(--accent-red); }
-    .warning .alert-icon { color: var(--accent-yellow); }
+    .badge-sin_stock { background: #fee2e2; color: #b91c1c; }
+    .badge-critico { background: #ffedd5; color: #c2410c; }
+    .badge-bajo { background: #fef9c3; color: #a16207; }
   </style>
 </head>
 <body>
@@ -46,9 +43,7 @@
       <a href="lotes.html" class="nav-item"><span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes</a>
       <a href="etiquetas.html" class="nav-item"><span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas</a>
 
-      <!-- VENTAS & COMPRAS -->
-      <p class="nav-section-title">VENTAS</p>
-      <a href="ventas-historial.html" class="nav-item"><span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas</a>
+      <!-- COMPRAS / VENTAS / OTROS -->
       <p class="nav-section-title">COMPRAS</p>
       <a href="compras.html" class="nav-item"><span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras</a>
       <a href="proveedores.html" class="nav-item"><span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores</a>
@@ -57,18 +52,43 @@
 
   <main class="main-content">
     <header class="topbar">
-      <div class="topbar-title"><h2>⚠️ Alertas de Stock Bajo</h2><p>Prioriza tus compras basadas en necesidades urgentes</p></div>
+      <div class="topbar-title"><h2>⚠️ Alertas de Stock Bajo</h2><p>Productos que requieren reabastecimiento urgente</p></div>
     </header>
 
-    <div class="page-content" style="max-width:800px; margin:0 auto;">
-      <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
-        <h3 style="font-size:18px">Alertas Pendientes (<span id="alert-count">0</span>)</h3>
-        <button class="btn btn-ghost" onclick="loadAlerts()"><i class="fa fa-sync"></i> Actualizar</button>
+    <div class="page-content">
+      
+      <div class="alert-card">
+        <div>
+          <h3 style="margin-bottom:8px">Resumen de Alertas</h3>
+          <p style="color:var(--text-muted);font-size:14px">Mostrando productos en nivel crítico o inferior al punto de reorden.</p>
+        </div>
+        <div style="text-align:right">
+          <button class="btn btn-primary" onclick="window.location.href='compras.html'">
+            <i class="fa fa-shopping-cart"></i> Crear Orden de Compra
+          </button>
+        </div>
       </div>
 
-      <div id="alerts-container">
-        <div style="text-align:center;padding:40px"><span class="spinner"></span></div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Producto / SKU</th>
+                <th>Estado</th>
+                <th>Stock Actual</th>
+                <th>Punto Reorden</th>
+                <th>Sugerido</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="alerts-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:24px"><span class="spinner"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
   </main>
 </div>
@@ -80,59 +100,45 @@
   document.addEventListener('DOMContentLoaded', loadAlerts);
 
   async function loadAlerts() {
-    const container = document.getElementById('alerts-container');
+    const tbody = document.getElementById('alerts-tbody');
     try {
-      const res = await apiFetch('/alerts?resuelta=false');
-      
-      if (!res.data || res.data.length === 0) {
-        document.getElementById('alert-count').textContent = '0';
-        container.innerHTML = `
-          <div style="text-align:center; padding: 60px 20px; background:var(--surface); border-radius:12px">
-            <i class="fa fa-check-circle" style="font-size:64px;color:var(--accent-green);margin-bottom:16px"></i>
-            <h3>¡Todo está bajo control!</h3>
-            <p style="color:var(--text-muted)">No tienes productos con stock crítico en este momento.</p>
-          </div>
-        `;
+      const res = await apiFetch('/inventory/low-stock');
+      const data = res.data;
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">🎉 No hay productos con stock bajo</td></tr>';
         return;
       }
 
-      document.getElementById('alert-count').textContent = res.data.length;
-      
-      container.innerHTML = res.data.map(al => {
-        // Asumiendo que 0 es crítico y mayor que 0 pero menor al punto de reorden es warning
-        const isCritical = al.stock_actual <= 0;
-        const p = al.producto || {};
+      tbody.innerHTML = data.map(item => {
+        let badge = '';
+        let estadoStr = '';
+        if (item.urgencia === 'sin_stock') { badge = 'badge-sin_stock'; estadoStr = 'Agotado'; }
+        else if (item.urgencia === 'critico') { badge = 'badge-critico'; estadoStr = 'Crítico'; }
+        else { badge = 'badge-bajo'; estadoStr = 'Bajo Reorden'; }
+
+        // Sugerencia simple (reponer hasta el doble del punto de reorden)
+        const sugerido = (item.punto_reorden * 2) - item.cantidad_disponible;
+
         return `
-          <div class="alert-card ${isCritical ? 'critical' : 'warning'}" id="al-${al._id}">
-            <div class="alert-icon"><i class="fa ${isCritical ? 'fa-times-circle' : 'fa-exclamation-triangle'}"></i></div>
-            <div style="flex:1">
-              <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">
-                Generada: ${new Date(al.createdAt).toLocaleString()} 
-                ${p.ubicacion ? `&bull; Ubicación: ${p.ubicacion}` : ''}
-              </div>
-              <div style="font-size:16px;font-weight:700;margin-bottom:4px">${p.nombre || 'Producto Desconocido'}</div>
-              <div style="font-size:14px">Stock Actual: <strong style="color:${isCritical ? 'var(--accent-red)' : 'var(--accent-yellow)'}">${al.stock_actual}</strong> / Mínimo requerido: ${al.punto_reorden}</div>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:8px; justify-content:center">
-              <a href="compras.html" class="btn btn-primary btn-sm"><i class="fa fa-shopping-bag"></i> Comprar</a>
-              <button class="btn btn-ghost btn-sm" onclick="resolverAlerta('${al._id}')"><i class="fa fa-check"></i> Ignorar</button>
-            </div>
-          </div>
+          <tr>
+            <td>
+              <div style="font-weight:600">${item.producto.nombre}</div>
+              <div style="font-size:12px;color:var(--text-muted)">SKU: ${item.producto.sku}</div>
+            </td>
+            <td><span class="badge ${badge}">${estadoStr}</span></td>
+            <td style="font-weight:bold; font-size:16px; color: ${item.cantidad_disponible === 0 ? 'red' : 'inherit'}">${item.cantidad_disponible}</td>
+            <td>${item.punto_reorden}</td>
+            <td style="color:#059669;font-weight:bold">+${sugerido > 0 ? sugerido : item.punto_reorden}</td>
+            <td>
+              <button class="btn btn-ghost btn-sm" title="Ignorar (Ocultar)" onclick="alert('Funcionalidad en desarrollo')"><i class="fa fa-eye-slash"></i></button>
+            </td>
+          </tr>
         `;
       }).join('');
-
     } catch (e) {
-      container.innerHTML = `<div style="color:red;padding:20px;text-align:center">Error: ${e.message}</div>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red">Error: ${e.message}</td></tr>`;
     }
-  }
-
-  async function resolverAlerta(id) {
-    if (!confirm('¿Seguro que deseas descartar/resolver esta alerta sin realizar compras?')) return;
-    try {
-      await apiFetch(`/alerts/${id}/resolve`, { method: 'PATCH' });
-      document.getElementById(`al-${id}`).style.opacity = '0.5';
-      setTimeout(loadAlerts, 500);
-    } catch (e) { alert('Error: ' + e.message); }
   }
 </script>
 </body>

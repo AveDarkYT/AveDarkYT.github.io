@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InventarioPro | Unidades de Medida</title>
+  <title>InventarioPro | Categorías</title>
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -14,41 +14,75 @@
     <nav class="sidebar-nav">
       <!-- PRINCIPAL -->
       <p class="nav-section-title">PRINCIPAL</p>
-      <a href="../index.html" class="nav-item"><span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio</a>
-      <a href="pos.html" class="nav-item"><span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta</a>
+      <a href="../index.html" class="nav-item" id="nav-dashboard">
+        <span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio
+      </a>
+      <a href="pos.html" class="nav-item" id="nav-pos">
+        <span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta
+      </a>
 
       <!-- INVENTARIO -->
       <p class="nav-section-title">INVENTARIO</p>
-      <a href="productos.html" class="nav-item"><span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos</a>
-      <a href="categorias.html" class="nav-item"><span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías</a>
-      <a href="unidades.html" class="nav-item active"><span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades</a>
-      <a href="marcas.html" class="nav-item"><span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas</a>
-      <a href="inventario.html" class="nav-item"><span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario</a>
-      <a href="stock-bajo.html" class="nav-item"><span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo</a>
-      <a href="lotes.html" class="nav-item"><span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes</a>
-      <a href="etiquetas.html" class="nav-item"><span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas</a>
+      <a href="productos.html" class="nav-item" id="nav-productos">
+        <span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos
+      </a>
+      <a href="categorias.html" class="nav-item active" id="nav-categorias">
+        <span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías
+      </a>
+      <a href="unidades.html" class="nav-item" id="nav-unidades">
+        <span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades
+      </a>
+      <a href="marcas.html" class="nav-item" id="nav-marcas">
+        <span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas
+      </a>
+      <a href="inventario.html" class="nav-item" id="nav-inventario">
+        <span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario
+      </a>
+      <a href="stock-bajo.html" class="nav-item" id="nav-stock-bajo">
+        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo
+      </a>
+      <a href="lotes.html" class="nav-item" id="nav-lotes">
+        <span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes
+      </a>
+      <a href="etiquetas.html" class="nav-item" id="nav-etiquetas">
+        <span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas
+      </a>
 
-      <!-- VENTAS & COMPRAS -->
+      <!-- VENTAS -->
       <p class="nav-section-title">VENTAS</p>
-      <a href="ventas-historial.html" class="nav-item"><span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas</a>
+      <a href="ventas-historial.html" class="nav-item" id="nav-ventas-historial">
+        <span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas
+      </a>
+
+      <!-- COMPRAS -->
       <p class="nav-section-title">COMPRAS</p>
-      <a href="compras.html" class="nav-item"><span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras</a>
-      <a href="proveedores.html" class="nav-item"><span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores</a>
-      <a href="pagos.html" class="nav-item"><span class="nav-icon"><i class="fa fa-money-bill-wave"></i></span> Pagos</a>
+      <a href="compras.html" class="nav-item" id="nav-compras">
+        <span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras
+      </a>
+      <a href="proveedores.html" class="nav-item" id="nav-proveedores">
+        <span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores
+      </a>
+      <a href="pagos.html" class="nav-item" id="nav-pagos">
+        <span class="nav-icon"><i class="fa fa-money-bill-wave"></i></span> Pagos
+      </a>
 
       <!-- OTROS -->
       <p class="nav-section-title">OTROS</p>
-      <a href="reportes.html" class="nav-item"><span class="nav-icon"><i class="fa fa-chart-line"></i></span> Reportes</a>
-      <a href="configuracion.html" class="nav-item"><span class="nav-icon"><i class="fa fa-cog"></i></span> Configuración</a>
+      <a href="reportes.html" class="nav-item" id="nav-reportes">
+        <span class="nav-icon"><i class="fa fa-chart-line"></i></span> Reportes
+      </a>
+      <a href="configuracion.html" class="nav-item" id="nav-configuracion">
+        <span class="nav-icon"><i class="fa fa-cog"></i></span> Configuración
+      </a>
     </nav>
   </aside>
 
   <main class="main-content">
     <header class="topbar">
-      <div class="topbar-title"><h2>⚖️ Unidades de Medida</h2><p>Piezas, Cajas, Kilos, Litros...</p></div>
+      <div class="topbar-title"><h2>🏷️ Categorías</h2><p>Clasifica tus productos para un mejor control</p></div>
       <div class="topbar-actions">
-        <button class="btn btn-primary" onclick="alert('Funcionalidad de unidades en desarrollo')">
-          <i class="fa fa-plus"></i> Nueva Unidad
+        <button class="btn btn-primary" id="btn-new">
+          <i class="fa fa-plus"></i> Nueva Categoría
         </button>
       </div>
     </header>
@@ -56,33 +90,21 @@
     <div class="page-content">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Listado de Unidades (Demostración UI)</div>
+          <div class="card-title">Listado de Categorías</div>
         </div>
         <div style="overflow-x:auto">
           <table class="data-table">
             <thead>
               <tr>
+                <th>Nombre</th>
                 <th>Abreviatura</th>
                 <th>Descripción</th>
+                <th>Estado</th>
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td style="font-weight:700">PZA</td>
-                <td>Pieza Individual</td>
-                <td><button class="btn btn-ghost btn-sm" title="Editar"><i class="fa fa-edit"></i></button></td>
-              </tr>
-              <tr>
-                <td style="font-weight:700">CAJ</td>
-                <td>Caja (Contiene varias piezas)</td>
-                <td><button class="btn btn-ghost btn-sm" title="Editar"><i class="fa fa-edit"></i></button></td>
-              </tr>
-              <tr>
-                <td style="font-weight:700">KG</td>
-                <td>Kilogramo</td>
-                <td><button class="btn btn-ghost btn-sm" title="Editar"><i class="fa fa-edit"></i></button></td>
-              </tr>
+            <tbody id="units-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:24px"><span class="spinner"></span></td></tr>
             </tbody>
           </table>
         </div>
@@ -90,7 +112,102 @@
     </div>
   </main>
 </div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="unit-modal">
+  <div class="modal-box" style="max-width:400px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <h3 style="font-size:18px;font-weight:700">Registrar Categoría</h3>
+      <button class="btn-icon" id="btn-close-modal"><i class="fa fa-times"></i></button>
+    </div>
+    <form id="unit-form">
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Nombre de Unidad *</label>
+        <input type="text" class="form-control" id="f-nombre" required>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Abreviatura *</label>
+        <input type="text" class="form-control" id="f-abbreviation" required placeholder="ej: kg, cm, caja">
+      </div>
+      <div class="form-group" style="margin-bottom:24px">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-control" id="f-descripcion" rows="3"></textarea>
+      </div>
+      
+      <div style="display:flex;gap:12px;justify-content:flex-end">
+        <button type="button" class="btn btn-ghost" id="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="../js/api.js"></script>
-<script>if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; }</script>
+<script>
+  if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadUnits();
+
+    document.getElementById('btn-new').addEventListener('click', () => {
+      document.getElementById('unit-form').reset();
+      document.getElementById('unit-modal').classList.add('open');
+    });
+
+    document.getElementById('btn-close-modal').addEventListener('click', close);
+    document.getElementById('btn-cancel').addEventListener('click', close);
+
+    document.getElementById('unit-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('f-nombre').value,
+        abbreviation: document.getElementById('f-abbreviation').value,
+        description: document.getElementById('f-descripcion').value
+      };
+
+      try {
+        await apiFetch('/units', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        close();
+        loadUnits();
+      } catch (err) {
+        alert('Error al guardar: ' + err.message);
+      }
+    });
+  });
+
+  function close() {
+    document.getElementById('unit-modal').classList.remove('open');
+  }
+
+  async function loadUnits() {
+    const tbody = document.getElementById('units-tbody');
+    try {
+      const res = await apiFetch('/units');
+      const data = res.data;
+      
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">No hay unidades registradas</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(c => `
+        <tr>
+          <td style="font-weight:600">${c.name}</td>
+          <td><span class="badge" style="background:#e0e7ff;color:#3730a3">${c.abbreviation}</span></td>
+          <td>${c.description || '-'}</td>
+          <td><span class="badge ${c.active !== false ? 'badge-success' : 'badge-danger'}">${c.active !== false ? 'Activo' : 'Inactivo'}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-sm" title="Editar"><i class="fa fa-edit"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red">Error: ${e.message}</td></tr>`;
+    }
+  }
+</script>
 </body>
 </html>

@@ -3,30 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InventarioPro | Ajustes Físicos y Trazabilidad</title>
+  <title>InventarioPro | Inventario Físico</title>
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    .search-results {
-      position: absolute; top: 100%; left: 0; right: 0;
-      background: var(--surface); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; margin-top: 4px; z-index: 10; max-height: 200px;
-      overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: none;
-    }
-    .search-item { padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .search-item:hover { background: rgba(255,255,255,0.05); }
-    .autocomplete-wrapper { position: relative; }
-    
-    .timeline { position: relative; padding-left: 24px; }
-    .timeline::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.1); }
-    .timeline-item { position: relative; margin-bottom: 24px; }
-    .timeline-item::before {
-      content: ''; position: absolute; left: -22px; top: 4px; width: 12px; height: 12px;
-      border-radius: 50%; background: var(--accent-blue); border: 2px solid var(--surface);
-    }
-    .t-entrada::before { background: var(--accent-green); }
-    .t-salida::before { background: var(--accent-red); }
-    .t-ajuste::before { background: var(--accent-yellow); }
+    .split-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .search-box { position: relative; }
+    .search-box input { width: 100%; padding: 12px 12px 12px 40px; font-size: 16px; border: 2px solid var(--border-color); border-radius: 8px; }
+    .search-box i { position: absolute; left: 14px; top: 14px; color: var(--text-muted); }
+    .product-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-top: 20px; display: none; }
+    .product-card.active { display: block; }
+    .stat-box { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; text-align: center; }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px; }
+    .history-table th, .history-table td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+    .history-table th { background: var(--bg-color); color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    .mov-entrada { color: #059669; font-weight: bold; }
+    .mov-salida { color: #dc2626; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -36,23 +28,21 @@
     <nav class="sidebar-nav">
       <!-- PRINCIPAL -->
       <p class="nav-section-title">PRINCIPAL</p>
-      <a href="../index.html" class="nav-item" id="nav-dashboard"><span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio</a>
-      <a href="pos.html" class="nav-item" id="nav-pos"><span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta</a>
+      <a href="../index.html" class="nav-item"><span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio</a>
+      <a href="pos.html" class="nav-item"><span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta</a>
 
       <!-- INVENTARIO -->
       <p class="nav-section-title">INVENTARIO</p>
-      <a href="productos.html" class="nav-item" id="nav-productos"><span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos</a>
-      <a href="categorias.html" class="nav-item" id="nav-categorias"><span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías</a>
-      <a href="unidades.html" class="nav-item" id="nav-unidades"><span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades</a>
-      <a href="marcas.html" class="nav-item" id="nav-marcas"><span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas</a>
-      <a href="inventario.html" class="nav-item active" id="nav-inventario"><span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario</a>
-      <a href="stock-bajo.html" class="nav-item" id="nav-stock-bajo"><span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo</a>
-      <a href="lotes.html" class="nav-item" id="nav-lotes"><span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes</a>
-      <a href="etiquetas.html" class="nav-item" id="nav-etiquetas"><span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas</a>
+      <a href="productos.html" class="nav-item"><span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos</a>
+      <a href="categorias.html" class="nav-item"><span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías</a>
+      <a href="unidades.html" class="nav-item"><span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades</a>
+      <a href="marcas.html" class="nav-item"><span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas</a>
+      <a href="inventario.html" class="nav-item active"><span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario</a>
+      <a href="stock-bajo.html" class="nav-item"><span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo</a>
+      <a href="lotes.html" class="nav-item"><span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes</a>
+      <a href="etiquetas.html" class="nav-item"><span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas</a>
 
-      <!-- VENTAS & COMPRAS -->
-      <p class="nav-section-title">VENTAS</p>
-      <a href="ventas-historial.html" class="nav-item"><span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas</a>
+      <!-- COMPRAS / VENTAS / OTROS -->
       <p class="nav-section-title">COMPRAS</p>
       <a href="compras.html" class="nav-item"><span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras</a>
       <a href="proveedores.html" class="nav-item"><span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores</a>
@@ -61,83 +51,111 @@
 
   <main class="main-content">
     <header class="topbar">
-      <div class="topbar-title"><h2>🏭 Control y Trazabilidad de Inventario</h2><p>Auditoría y ajustes de stock físico</p></div>
+      <div class="topbar-title"><h2>📦 Inventario Físico (Ajustes)</h2><p>Trazabilidad estricta de almacén</p></div>
     </header>
 
-    <div class="page-content" style="display:grid; grid-template-columns: 1fr 400px; gap: 24px;">
-      
-      <!-- Panel de Búsqueda y Trazabilidad -->
-      <div style="display:flex; flex-direction:column; gap:24px;">
-        <div class="card">
-          <div class="card-header"><div class="card-title">Buscar Producto a Auditar</div></div>
-          <div class="card-body">
-            <div class="autocomplete-wrapper">
-              <input type="text" class="form-control" id="product-search" placeholder="Escanea código de barras o busca por nombre/SKU" autofocus>
-              <div class="search-results" id="search-results"></div>
+    <div class="page-content">
+      <div class="split-layout">
+        <!-- Panel Izquierdo: Operación -->
+        <div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Seleccionar Producto</div></div>
+            <div class="search-box">
+              <i class="fa fa-search"></i>
+              <input type="text" id="product-search" placeholder="Buscar por SKU, código o nombre..." autofocus autocomplete="off">
+              <div id="search-results" style="position:absolute; width:100%; background:#fff; border:1px solid #ccc; max-height:200px; overflow-y:auto; z-index:10; display:none; border-radius:0 0 8px 8px; box-shadow:0 4px 6px rgba(0,0,0,0.1);"></div>
+            </div>
+
+            <div class="product-card" id="selected-product-card">
+              <h3 id="p-name" style="margin-bottom:8px">Producto</h3>
+              <p style="color:var(--text-muted);font-family:monospace;margin-bottom:16px" id="p-sku">SKU: </p>
+              
+              <div class="stat-box">
+                <div class="stat-value" id="p-stock">0</div>
+                <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase">Stock Actual</div>
+              </div>
+
+              <form id="adjustment-form" style="margin-top:24px">
+                <h4 style="margin-bottom:12px;font-size:14px;color:var(--primary-color)">NUEVO AJUSTE</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Tipo Movimiento</label>
+                    <select class="form-control" id="f-tipo">
+                      <option value="ENTRADA">Entrada (Suma)</option>
+                      <option value="SALIDA">Salida (Resta)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <input type="number" class="form-control" id="f-cantidad" min="1" required>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-top:16px">
+                  <label class="form-label">Motivo (Trazabilidad) *</label>
+                  <select class="form-control" id="f-motivo" required>
+                    <option value="">Seleccione un motivo...</option>
+                    <option value="Ajuste de Inventario">Ajuste de Inventario Físico (Auditoría)</option>
+                    <option value="Mercancia Dañada">Mercancía Dañada / Vencida</option>
+                    <option value="Devolucion">Devolución a Almacén</option>
+                    <option value="Uso Interno">Consumo / Uso Interno</option>
+                    <option value="Otro">Otro (Especificar en notas)</option>
+                  </select>
+                </div>
+
+                <h4 style="margin-top:24px;margin-bottom:12px;font-size:14px;color:var(--primary-color)">UBICACIÓN (OPCIONAL)</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="f-pasillo" placeholder="Pasillo">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="f-estante" placeholder="Estante">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="f-nivel" placeholder="Nivel">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="f-posicion" placeholder="Posición">
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-top:16px">
+                  <label class="form-label">Notas Adicionales</label>
+                  <input type="text" class="form-control" id="f-notas" placeholder="Detalles de la auditoría o evidencia">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width:100%;margin-top:24px" id="btn-save">
+                  <i class="fa fa-save"></i> Registrar Ajuste
+                </button>
+              </form>
             </div>
           </div>
         </div>
 
-        <div class="card" id="panel-trazabilidad" style="display:none; flex:1;">
-          <div class="card-header" style="justify-content:space-between">
-            <div class="card-title">Historial de Movimientos (Kardex)</div>
-            <span class="badge" style="background:var(--accent-blue);color:#fff" id="lbl-sku"></span>
-          </div>
-          <div class="card-body">
-            <h3 id="lbl-nombre" style="margin-bottom:24px">Producto</h3>
-            <div class="timeline" id="timeline-container">
-              <!-- JS Injects timeline here -->
+        <!-- Panel Derecho: Trazabilidad -->
+        <div>
+          <div class="card" style="height: 100%">
+            <div class="card-header"><div class="card-title"><i class="fa fa-history"></i> Historial de Movimientos</div></div>
+            <div style="padding:16px;text-align:center;color:var(--text-muted)" id="history-placeholder">
+              Seleccione un producto para ver su trazabilidad
+            </div>
+            <div style="overflow-y:auto;max-height:600px;display:none" id="history-container">
+              <table style="width:100%;border-collapse:collapse" class="history-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Cant</th>
+                    <th>Motivo</th>
+                    <th>Ubicación</th>
+                  </tr>
+                </thead>
+                <tbody id="history-tbody"></tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Panel de Ajuste Físico -->
-      <div class="card" id="panel-ajuste" style="display:none; align-self: start;">
-        <div class="card-header"><div class="card-title">Ajuste Físico de Inventario</div></div>
-        <div class="card-body">
-          <form id="form-ajuste">
-            <input type="hidden" id="f-product-id">
-            
-            <div style="text-align:center; padding:16px; background:rgba(255,255,255,0.05); border-radius:8px; margin-bottom:24px;">
-              <p style="color:var(--text-muted); font-size:12px">Stock Actual en Sistema</p>
-              <div style="font-size:32px; font-weight:700; color:var(--accent-blue)" id="lbl-stock">0</div>
-            </div>
-
-            <div class="form-group" style="margin-bottom:16px">
-              <label class="form-label">Conteo Físico Real *</label>
-              <input type="number" class="form-control" id="f-conteo" required min="0" style="font-size:24px; height:50px;">
-            </div>
-
-            <div class="form-group" style="margin-bottom:16px">
-              <label class="form-label">Ubicación (Pasillo-Estante) *</label>
-              <input type="text" class="form-control" id="f-ubicacion" required placeholder="Ej. P01-E04-N2">
-            </div>
-
-            <div class="form-group" style="margin-bottom:24px">
-              <label class="form-label">Motivo del Ajuste *</label>
-              <select class="form-control" id="f-motivo" required>
-                <option value="">Seleccionar justificación...</option>
-                <option value="Auditoría / Conteo Regular">Auditoría / Conteo Regular</option>
-                <option value="Mercancía Dañada / Merma">Mercancía Dañada / Merma</option>
-                <option value="Pérdida / Robo">Pérdida / Robo</option>
-                <option value="Error de Despacho">Error de Despacho</option>
-                <option value="Otro">Otro (Especificar en notas)</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="margin-bottom:24px">
-              <label class="form-label">Notas Adicionales (Trazabilidad)</label>
-              <textarea class="form-control" id="f-notas" rows="3" placeholder="Detalles de la incidencia..."></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center" id="btn-save-ajuste">
-              <i class="fa fa-save"></i> Registrar Ajuste Inmutable
-            </button>
-          </form>
-        </div>
-      </div>
-
     </div>
   </main>
 </div>
@@ -148,142 +166,155 @@
 
   let searchTimer = null;
   const searchInput = document.getElementById('product-search');
-  const resultsBox = document.getElementById('search-results');
+  const resultsDiv = document.getElementById('search-results');
+  let selectedProductId = null;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    
-    searchInput.addEventListener('input', (e) => {
-      clearTimeout(searchTimer);
-      const q = e.target.value.trim();
-      if (q.length < 2) { resultsBox.style.display = 'none'; return; }
-      
-      searchTimer = setTimeout(async () => {
-        try {
-          const res = await apiFetch(`/products/buscar?q=${encodeURIComponent(q)}`);
-          if (res.data && res.data.length > 0) {
-            resultsBox.innerHTML = res.data.map(p => `
-              <div class="search-item" onclick="loadProductTraceability('${p._id}', '${p.nombre.replace(/'/g,"\\'").replace(/"/g,"&quot;")}', '${p.sku}')">
-                <span>${p.nombre}</span>
-                <span style="font-family:monospace;color:var(--text-muted)">${p.sku}</span>
-              </div>
-            `).join('');
-            resultsBox.style.display = 'block';
-          } else {
-            resultsBox.style.display = 'none';
-          }
-        } catch(err) { console.error(err); }
-      }, 300);
-    });
-
-    document.addEventListener('click', (e) => {
-      if(!e.target.closest('.autocomplete-wrapper')) resultsBox.style.display = 'none';
-    });
-
-    document.getElementById('form-ajuste').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const pId = document.getElementById('f-product-id').value;
-      const payload = {
-        producto_id: pId,
-        cantidad: Number(document.getElementById('f-conteo').value),
-        ubicacion: document.getElementById('f-ubicacion').value,
-        motivo: document.getElementById('f-motivo').value,
-        notas: document.getElementById('f-notas').value
-      };
-
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimer);
+    const q = e.target.value.trim();
+    if (q.length < 2) {
+      resultsDiv.style.display = 'none';
+      return;
+    }
+    searchTimer = setTimeout(async () => {
       try {
-        const btn = document.getElementById('btn-save-ajuste');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span>';
-
-        await apiFetch('/inventory/ajuste', {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        
-        showToast('success', 'Ajuste Registrado', 'Inventario y trazabilidad actualizados correctamente');
-        document.getElementById('form-ajuste').reset();
-        
-        // Recargar trazabilidad
-        const nom = document.getElementById('lbl-nombre').textContent;
-        const sku = document.getElementById('lbl-sku').textContent;
-        loadProductTraceability(pId, nom, sku);
-
+        const res = await apiFetch(`/products/buscar?q=${encodeURIComponent(q)}`);
+        const data = res.data;
+        if (!data || data.length === 0) {
+          resultsDiv.innerHTML = '<div style="padding:10px;color:#666">No hay resultados</div>';
+        } else {
+          resultsDiv.innerHTML = data.map(p => `
+            <div style="padding:12px;border-bottom:1px solid #eee;cursor:pointer" onclick="selectProduct('${p._id}')">
+              <strong>${p.nombre}</strong><br>
+              <small style="color:#666">SKU: ${p.sku} | Barras: ${p.codigo_barras || 'N/A'} | Stock: ${p.inventario_total || 0}</small>
+            </div>
+          `).join('');
+        }
+        resultsDiv.style.display = 'block';
       } catch (err) {
-        alert('Error: ' + err.message);
-      } finally {
-        const btn = document.getElementById('btn-save-ajuste');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa fa-save"></i> Registrar Ajuste Inmutable';
+        console.error(err);
       }
-    });
+    }, 300);
   });
 
-  async function loadProductTraceability(id, name, sku) {
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+      resultsDiv.style.display = 'none';
+    }
+  });
+
+  async function selectProduct(id) {
+    resultsDiv.style.display = 'none';
     searchInput.value = '';
-    resultsBox.style.display = 'none';
     
-    document.getElementById('panel-trazabilidad').style.display = 'flex';
-    document.getElementById('panel-trazabilidad').style.flexDirection = 'column';
-    document.getElementById('panel-ajuste').style.display = 'block';
-    
-    document.getElementById('f-product-id').value = id;
-    document.getElementById('lbl-nombre').textContent = name;
-    document.getElementById('lbl-sku').textContent = 'SKU: ' + sku;
-
     try {
-      // 1. Obtener Stock Actual
-      const pRes = await apiFetch(`/products/${id}`);
-      let stockActual = 0;
-      if (pRes.data && pRes.data.inventario) {
-        stockActual = pRes.data.inventario.cantidad_disponible;
-        document.getElementById('f-ubicacion').value = pRes.data.producto.ubicacion || '';
-      }
-      document.getElementById('lbl-stock').textContent = stockActual;
-      document.getElementById('f-conteo').value = stockActual;
-
-      // 2. Obtener Historial Real
-      const movRes = await apiFetch(`/movements?producto=${id}`);
-      const timeline = document.getElementById('timeline-container');
+      const res = await apiFetch(`/products/${id}`);
+      const p = res.data;
+      selectedProductId = p._id;
       
-      if (!movRes.data || movRes.data.length === 0) {
-        timeline.innerHTML = '<div style="color:var(--text-muted)">No hay registros de movimientos para este producto.</div>';
-        return;
+      document.getElementById('p-name').textContent = p.nombre;
+      document.getElementById('p-sku').textContent = `SKU: ${p.sku} | Barras: ${p.codigo_barras || 'N/A'}`;
+      document.getElementById('p-stock').textContent = p.inventario_total || 0;
+      
+      // Llenar ubicacion si existe
+      if (p.ubicacion) {
+        document.getElementById('f-pasillo').value = p.ubicacion.pasillo || '';
+        document.getElementById('f-estante').value = p.ubicacion.estante || '';
+        document.getElementById('f-nivel').value = p.ubicacion.nivel || '';
+        document.getElementById('f-posicion').value = p.ubicacion.posicion || '';
+      } else {
+        document.getElementById('f-pasillo').value = '';
+        document.getElementById('f-estante').value = '';
+        document.getElementById('f-nivel').value = '';
+        document.getElementById('f-posicion').value = '';
       }
 
-      timeline.innerHTML = movRes.data.map(m => {
-        let typeClass = 't-ajuste';
-        let icon = 'fa-exchange-alt';
-        if (m.tipo === 'entrada') { typeClass = 't-entrada'; icon = 'fa-arrow-down'; }
-        else if (m.tipo === 'salida') { typeClass = 't-salida'; icon = 'fa-arrow-up'; }
-        
-        const dateStr = new Date(m.createdAt).toLocaleString('es-ES', { 
-          day: '2-digit', month: 'short', year: 'numeric', 
-          hour: '2-digit', minute:'2-digit'
-        });
-
-        return `
-          <div class="timeline-item ${typeClass}">
-            <div style="font-size:12px;color:var(--text-muted)">${dateStr} &bull; <i class="fa ${icon}"></i> ${m.tipo.toUpperCase()}</div>
-            <div style="font-weight:600;margin:4px 0">
-              Cantidad: ${m.cantidad} | Stock Anterior: ${m.stock_anterior} &rarr; Nuevo: ${m.stock_nuevo}
-            </div>
-            <div style="font-size:13px;color:var(--text-muted)">
-              Justificación: ${m.notas || m.motivo || 'N/A'}
-            </div>
-          </div>
-        `;
-      }).join('');
-
-    } catch(e) {
-      alert('Error cargando datos del producto: ' + e.message);
+      document.getElementById('selected-product-card').classList.add('active');
+      document.getElementById('adjustment-form').reset();
+      
+      loadHistory(p._id);
+    } catch (e) {
+      alert('Error cargando producto: ' + e.message);
     }
   }
 
-  // Toast helper simple
-  function showToast(type, title, msg) {
-    alert(title + ": " + msg); // Reemplazar con UI Toast real si se desea
+  async function loadHistory(id) {
+    document.getElementById('history-placeholder').style.display = 'none';
+    const container = document.getElementById('history-container');
+    const tbody = document.getElementById('history-tbody');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center"><span class="spinner"></span></td></tr>';
+    container.style.display = 'block';
+
+    try {
+      // Usaremos el endpoint the inventory / movements. Si no existe, crearemos un wrapper.
+      // El backend tiene /api/movements
+      const res = await apiFetch(`/movements?productoId=${id}&limit=20`);
+      const moves = res.data;
+      
+      if (!moves || moves.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">No hay movimientos registrados</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = moves.map(m => `
+        <tr>
+          <td style="white-space:nowrap">${new Date(m.createdAt).toLocaleString()}</td>
+          <td class="${m.tipo === 'ENTRADA' ? 'mov-entrada' : 'mov-salida'}">${m.tipo}</td>
+          <td style="font-weight:bold">${m.tipo === 'ENTRADA' ? '+' : '-'}${m.cantidad}</td>
+          <td>${m.motivo}<br><small style="color:#888">${m.referencia || m.notas || ''}</small></td>
+          <td style="font-size:11px;color:#666">
+            ${m.ubicacion_afectada ? 
+              `${m.ubicacion_afectada.pasillo||'-'}/${m.ubicacion_afectada.estante||'-'}` : '-'}
+          </td>
+        </tr>
+      `).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red">Error: ${e.message}</td></tr>`;
+    }
   }
+
+  document.getElementById('adjustment-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!selectedProductId) return;
+
+    const stockActual = parseInt(document.getElementById('p-stock').textContent, 10) || 0;
+    const tipo = document.getElementById('f-tipo').value;
+    const cant = parseInt(document.getElementById('f-cantidad').value, 10);
+    const nueva_cantidad = tipo === 'ENTRADA' ? stockActual + cant : stockActual - cant;
+
+    if (nueva_cantidad < 0) {
+      alert('Error: La cantidad resultante no puede ser negativa.');
+      return;
+    }
+
+    const payload = {
+      producto_id: selectedProductId,
+      nueva_cantidad: nueva_cantidad,
+      motivo: document.getElementById('f-motivo').value,
+      ubicacion: document.getElementById('f-pasillo').value + ' ' + document.getElementById('f-estante').value, // El backend espera un String o similar en ubicacion, lo enviamos como string
+      notas: document.getElementById('f-notas').value
+    };
+
+    const btn = document.getElementById('btn-save');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Guardando...';
+
+    try {
+      await apiFetch('/inventory/ajuste', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      // Recargar
+      await selectProduct(selectedProductId);
+      alert('Ajuste registrado exitosamente');
+    } catch (e) {
+      alert('Error: ' + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-save"></i> Registrar Ajuste';
+    }
+  });
+
 </script>
 </body>
 </html>
