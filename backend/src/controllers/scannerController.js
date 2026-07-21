@@ -272,3 +272,31 @@ exports.lookup = async (req, res, next) => {
     next(error);
   }
 };
+
+// GET /api/scanner/next-barcode
+exports.nextBarcode = async (req, res, next) => {
+  try {
+    // Buscar el producto con el código de barras que empiece con P seguido de números
+    const Product = require('../models/Product');
+    const lastProduct = await Product.findOne({
+      codigo_barras: { $regex: /^P\d{4}$/ }
+    })
+    .sort({ codigo_barras: -1 })
+    .select('codigo_barras')
+    .lean();
+
+    let nextCode = 'P0001';
+    if (lastProduct && lastProduct.codigo_barras) {
+      const lastNumber = parseInt(lastProduct.codigo_barras.substring(1), 10);
+      if (!isNaN(lastNumber)) {
+        const newNumber = lastNumber + 1;
+        // Padding con 4 ceros (ej: P0056)
+        nextCode = `P${newNumber.toString().padStart(4, '0')}`;
+      }
+    }
+
+    return res.json({ success: true, next_barcode: nextCode });
+  } catch (error) {
+    next(error);
+  }
+};

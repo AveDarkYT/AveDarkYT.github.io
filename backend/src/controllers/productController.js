@@ -72,6 +72,28 @@ exports.obtenerPorId = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+// GET /api/products/buscar/rapido
+exports.buscar = async (req, res, next) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.length < 2) return res.json({ success: true, data: [] });
+
+    const productos = await Product.find({
+      activo: true,
+      $or: [
+        { nombre: { $regex: q, $options: 'i' } },
+        { sku: { $regex: q, $options: 'i' } },
+        { codigo_barras: { $regex: q, $options: 'i' } }
+      ]
+    })
+    .select('_id nombre sku codigo_barras')
+    .limit(10)
+    .lean();
+
+    return res.json({ success: true, data: productos });
+  } catch (error) { next(error); }
+};
+
 // POST /api/products
 exports.crear = async (req, res, next) => {
   try {

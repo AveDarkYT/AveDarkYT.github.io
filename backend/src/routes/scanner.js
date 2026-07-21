@@ -10,5 +10,6 @@ const ctrl = require('../controllers/scannerController');
 // Rate limiter exclusivo (permite alta velocidad de escaneo)
 router.post('/scan',        protect, scannerLimiter, ctrl.scan);
 router.get('/lookup/:barcode', protect, ctrl.lookup);
+router.get('/next-barcode', protect, ctrl.nextBarcode);
 
 module.exports = router;

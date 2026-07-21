@@ -139,3 +139,54 @@ exports.resumen = async (req, res, next) => {
     return res.json({ success: true, data: resumen || {} });
   } catch (error) { next(error); }
 };
+
+// POST /api/inventory/ajuste ?" Ajuste manual de inventario
+exports.ajuste = async (req, res, next) => {
+  try {
+    const { producto_id, nueva_cantidad, ubicacion, motivo } = req.body;
+    
+    if (nueva_cantidad === undefined || nueva_cantidad < 0) {
+      return res.status(400).json({ success: false, message: 'La nueva cantidad es inválida' });
+    }
+    if (!motivo) {
+      return res.status(400).json({ success: false, message: 'Se requiere un motivo para el ajuste' });
+    }
+
+    const inventory = await Inventory.findOne({ producto: producto_id });
+    if (!inventory) {
+      return res.status(404).json({ success: false, message: 'Registro de inventario no encontrado' });
+    }
+
+    const cantidadAnterior = inventory.cantidad_disponible;
+    const diferencia = nueva_cantidad - cantidadAnterior;
+
+    // Actualizar inventario
+    inventory.cantidad_disponible = nueva_cantidad;
+    if (diferencia > 0) inventory.ultima_entrada = new Date();
+    if (diferencia < 0) inventory.ultima_salida = new Date();
+    await inventory.save();
+
+    // Registrar en el historial inmutable (Movement)
+    const Movement = require('../models/Movement');
+    const movimiento = await Movement.create({
+      company_id: req.user.company_id || '000000000000000000000000',
+      type: 'Ajuste',
+      reference: `Ajuste: ${motivo}`,
+      origin: ubicacion || 'Almacén Principal',
+      destination: ubicacion || 'Almacén Principal',
+      status: 'Completado',
+      items: [{
+        product_id: producto_id,
+        quantity: Math.abs(diferencia)
+      }],
+      created_by: req.user._id,
+      notes: `Ajuste de inventario. Anterior: ${cantidadAnterior}, Nuevo: ${nueva_cantidad}, Diferencia: ${diferencia}`
+    });
+
+    return res.json({ 
+      success: true, 
+      message: 'Ajuste de inventario registrado correctamente', 
+      data: { inventory, movimiento } 
+    });
+  } catch (error) { next(error); }
+};

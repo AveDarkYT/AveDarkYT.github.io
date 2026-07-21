@@ -8,6 +8,7 @@ const ctrl = require('../controllers/productController');
 router.use(protect);
 
 router.get('/',    ctrl.obtenerTodos);
+router.get('/buscar', ctrl.buscar);
 router.get('/:id', ctrl.obtenerPorId);
 router.get('/:id/historial-compras', ctrl.obtenerHistorialCompras);
 router.post('/',   restrictTo('admin', 'operador'), ctrl.crear);
