@@ -3,6 +3,11 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
+  company_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+    // Opcional temporalmente para compatibilidad con datos existentes
+  },
   sku: {
     type: String,
     required: [true, 'El SKU es requerido'],

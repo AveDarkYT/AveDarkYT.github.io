@@ -16,6 +16,8 @@ const movementRoutes  = require('./routes/movements');
 const scannerRoutes   = require('./routes/scanner');
 const alertRoutes     = require('./routes/alerts');
 const dispatchRoutes  = require('./routes/dispatch');
+const orderRoutes     = require('./routes/orders');
+const entityRoutes    = require('./routes/entities');
 
 const app = express();
 
@@ -61,6 +63,8 @@ app.use('/api/movements', movementRoutes);
 app.use('/api/scanner',   scannerRoutes);   // ⚡ Endpoint optimizado
 app.use('/api/alerts',    alertRoutes);
 app.use('/api/dispatch',  dispatchRoutes);
+app.use('/api/orders',    orderRoutes);
+app.use('/api/entities',  entityRoutes);
 
 // ── Frontend ────────────────────────────────────
 app.use(express.static(path.join(__dirname, '../../frontend')));
