@@ -3,9 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InventarioPro | Módulo en Construcción</title>
+  <title>InventarioPro | Compras (Recepciones)</title>
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .search-results {
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      margin-top: 4px;
+      z-index: 10;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: none;
+    }
+    .search-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .search-item:hover { background: rgba(255,255,255,0.05); }
+    .autocomplete-wrapper { position: relative; }
+  </style>
 </head>
 <body>
 <div class="app-layout">
@@ -56,7 +80,7 @@
 
       <!-- COMPRAS -->
       <p class="nav-section-title">COMPRAS</p>
-      <a href="compras.html" class="nav-item" id="nav-compras">
+      <a href="compras.html" class="nav-item active" id="nav-compras">
         <span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras
       </a>
       <a href="proveedores.html" class="nav-item" id="nav-proveedores">
@@ -79,27 +103,192 @@
 
   <main class="main-content">
     <header class="topbar">
-      <div class="topbar-title"><h2>🚧 Módulo en Construcción</h2><p>Esta sección estará disponible próximamente</p></div>
+      <div class="topbar-title"><h2>🛒 Recepción de Mercancía</h2><p>Registra compras y actualiza tu inventario</p></div>
     </header>
 
-    <div class="page-content">
-      <div class="card" style="text-align:center; padding: 60px 20px;">
-        <i class="fa fa-tools" style="font-size: 64px; color: var(--accent-blue); margin-bottom: 24px;"></i>
-        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 12px;">¡Trabajando en ello!</h2>
-        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 24px;">
-          Actualmente estamos desarrollando este módulo para brindarte las mejores herramientas. 
-          Vuelve pronto para descubrir las nuevas funcionalidades.
-        </p>
-        <button class="btn btn-primary" onclick="history.back()" style="margin: 0 auto;">
-          <i class="fa fa-arrow-left"></i> Volver Atrás
-        </button>
+    <div class="page-content" style="display:grid; grid-template-columns: 1fr 350px; gap: 24px;">
+      
+      <!-- Detalle de la Compra -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Buscar Producto</div>
+        </div>
+        <div class="card-body">
+          <div class="autocomplete-wrapper" style="margin-bottom:24px;">
+            <input type="text" class="form-control" id="product-search" placeholder="Escribe el nombre o SKU para buscar...">
+            <div class="search-results" id="search-results"></div>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th style="width:100px">Cantidad</th>
+                <th style="width:120px">Costo Unit.</th>
+                <th style="width:120px">Subtotal</th>
+                <th style="width:50px"></th>
+              </tr>
+            </thead>
+            <tbody id="cart-tbody">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:32px;">Agrega productos a la compra</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      <!-- Totales y Confirmación -->
+      <div class="card" style="align-self: start;">
+        <div class="card-header">
+          <div class="card-title">Resumen de Compra</div>
+        </div>
+        <div class="card-body">
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label">Proveedor *</label>
+            <select class="form-control" id="f-proveedor" required>
+              <option value="">Seleccione...</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:24px;">
+            <label class="form-label">Referencia / Factura</label>
+            <input type="text" class="form-control" id="f-referencia" placeholder="F-00123">
+          </div>
+
+          <div style="display:flex; justify-content:space-between; font-size:24px; font-weight:700; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px; margin-bottom:24px;">
+            <span>Total:</span>
+            <span id="txt-total" style="color:var(--accent-green)">$0.00</span>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center" id="btn-process">
+            <i class="fa fa-check-circle"></i> Confirmar Recepción
+          </button>
+        </div>
+      </div>
+
     </div>
   </main>
 </div>
+
 <script src="../js/api.js"></script>
 <script>
   if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; }
+
+  let cart = [];
+  let searchTimer = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Cargar proveedores
+    try {
+      const res = await apiFetch('/entities?tipo=Proveedor');
+      const provSelect = document.getElementById('f-proveedor');
+      res.data.filter(e => e.tipo === 'Proveedor').forEach(p => {
+        provSelect.innerHTML += `<option value="${p._id}">${p.nombre}</option>`;
+      });
+    } catch(e) { console.error('Error cargando proveedores', e); }
+
+    // Búsqueda de productos
+    const searchInput = document.getElementById('product-search');
+    const resultsBox = document.getElementById('search-results');
+
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      const q = e.target.value;
+      if (q.length < 2) { resultsBox.style.display = 'none'; return; }
+      
+      searchTimer = setTimeout(async () => {
+        try {
+          const res = await apiFetch(`/products/buscar?q=${encodeURIComponent(q)}`);
+          if (res.data && res.data.length > 0) {
+            resultsBox.innerHTML = res.data.map(p => `
+              <div class="search-item" onclick="addToCart('${p._id}', '${p.nombre.replace(/'/g,"\\'").replace(/"/g,"&quot;")}')">
+                <span>${p.nombre}</span>
+                <span style="font-family:monospace;color:var(--text-muted)">${p.sku}</span>
+              </div>
+            `).join('');
+            resultsBox.style.display = 'block';
+          } else {
+            resultsBox.innerHTML = '<div style="padding:10px 12px;color:var(--text-muted)">No hay resultados</div>';
+            resultsBox.style.display = 'block';
+          }
+        } catch(err) { console.error(err); }
+      }, 300); // 300ms debounce
+    });
+
+    // Cerrar buscador al hacer click fuera
+    document.addEventListener('click', (e) => {
+      if(!e.target.closest('.autocomplete-wrapper')) resultsBox.style.display = 'none';
+    });
+
+    // Procesar compra
+    document.getElementById('btn-process').addEventListener('click', processPurchase);
+  });
+
+  function addToCart(id, name) {
+    if (cart.find(i => i.product_id === id)) return; // Ya está en el carrito
+    cart.push({ product_id: id, name, quantity: 1, unit_price: 0 });
+    document.getElementById('product-search').value = '';
+    document.getElementById('search-results').style.display = 'none';
+    renderCart();
+  }
+
+  function renderCart() {
+    const tbody = document.getElementById('cart-tbody');
+    if (cart.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:32px;">Agrega productos a la compra</td></tr>';
+      document.getElementById('txt-total').textContent = '$0.00';
+      return;
+    }
+
+    let total = 0;
+    tbody.innerHTML = cart.map((item, index) => {
+      const subtotal = item.quantity * item.unit_price;
+      total += subtotal;
+      return `
+        <tr>
+          <td><div style="font-weight:600;font-size:14px">${item.name}</div></td>
+          <td><input type="number" class="form-control" value="${item.quantity}" min="1" onchange="updateQty(${index}, this.value)"></td>
+          <td><input type="number" class="form-control" value="${item.unit_price}" min="0" step="0.01" onchange="updatePrice(${index}, this.value)"></td>
+          <td style="font-weight:700">$${subtotal.toFixed(2)}</td>
+          <td><button class="btn-icon" style="color:var(--accent-red)" onclick="removeItem(${index})"><i class="fa fa-trash"></i></button></td>
+        </tr>
+      `;
+    }).join('');
+    
+    document.getElementById('txt-total').textContent = `$${total.toFixed(2)}`;
+  }
+
+  function updateQty(idx, val) { cart[idx].quantity = Number(val); renderCart(); }
+  function updatePrice(idx, val) { cart[idx].unit_price = Number(val); renderCart(); }
+  function removeItem(idx) { cart.splice(idx, 1); renderCart(); }
+
+  async function processPurchase() {
+    if (cart.length === 0) return alert('El carrito está vacío');
+    const entity_id = document.getElementById('f-proveedor').value;
+    if (!entity_id) return alert('Debes seleccionar un proveedor');
+
+    const totalStr = document.getElementById('txt-total').textContent.replace('$', '');
+    const payload = {
+      tipo: 'Compra',
+      entity_id,
+      estado: 'Completado',
+      reference: document.getElementById('f-referencia').value || 'S/R',
+      items: cart,
+      total: Number(totalStr)
+    };
+
+    try {
+      const res = await apiFetch('/orders', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      alert('¡Compra registrada! El inventario y costos históricos han sido actualizados.');
+      cart = [];
+      renderCart();
+      document.getElementById('f-proveedor').value = '';
+      document.getElementById('f-referencia').value = '';
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  }
 </script>
 </body>
 </html>

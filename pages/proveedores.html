@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InventarioPro | Módulo en Construcción</title>
+  <title>InventarioPro | Proveedores</title>
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -59,7 +59,7 @@
       <a href="compras.html" class="nav-item" id="nav-compras">
         <span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras
       </a>
-      <a href="proveedores.html" class="nav-item" id="nav-proveedores">
+      <a href="proveedores.html" class="nav-item active" id="nav-proveedores">
         <span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores
       </a>
       <a href="pagos.html" class="nav-item" id="nav-pagos">
@@ -79,27 +79,150 @@
 
   <main class="main-content">
     <header class="topbar">
-      <div class="topbar-title"><h2>🚧 Módulo en Construcción</h2><p>Esta sección estará disponible próximamente</p></div>
+      <div class="topbar-title"><h2>🚚 Proveedores</h2><p>Gestiona tu catálogo de proveedores</p></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" id="btn-new">
+          <i class="fa fa-plus"></i> Nuevo Proveedor
+        </button>
+      </div>
     </header>
 
     <div class="page-content">
-      <div class="card" style="text-align:center; padding: 60px 20px;">
-        <i class="fa fa-tools" style="font-size: 64px; color: var(--accent-blue); margin-bottom: 24px;"></i>
-        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 12px;">¡Trabajando en ello!</h2>
-        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 24px;">
-          Actualmente estamos desarrollando este módulo para brindarte las mejores herramientas. 
-          Vuelve pronto para descubrir las nuevas funcionalidades.
-        </p>
-        <button class="btn btn-primary" onclick="history.back()" style="margin: 0 auto;">
-          <i class="fa fa-arrow-left"></i> Volver Atrás
-        </button>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Listado de Proveedores</div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre Comercial</th>
+                <th>Contacto Principal</th>
+                <th>Email / Teléfono</th>
+                <th>NIT / Doc</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="proveedores-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:24px"><span class="spinner"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
 </div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="provider-modal">
+  <div class="modal-box" style="max-width:500px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <h3 style="font-size:18px;font-weight:700">Registrar Proveedor</h3>
+      <button class="btn-icon" id="btn-close-modal"><i class="fa fa-times"></i></button>
+    </div>
+    <form id="provider-form">
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Nombre Comercial *</label>
+        <input type="text" class="form-control" id="f-nombre" required>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Contacto Principal</label>
+        <input type="text" class="form-control" id="f-contacto">
+      </div>
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="text" class="form-control" id="f-telefono">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="f-email">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:24px">
+        <label class="form-label">Documento / NIT</label>
+        <input type="text" class="form-control" id="f-documento">
+      </div>
+      
+      <div style="display:flex;gap:12px;justify-content:flex-end">
+        <button type="button" class="btn btn-ghost" id="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="../js/api.js"></script>
 <script>
   if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadProviders();
+
+    document.getElementById('btn-new').addEventListener('click', () => {
+      document.getElementById('provider-form').reset();
+      document.getElementById('provider-modal').classList.add('open');
+    });
+
+    document.getElementById('btn-close-modal').addEventListener('click', close);
+    document.getElementById('btn-cancel').addEventListener('click', close);
+
+    document.getElementById('provider-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        tipo: 'Proveedor',
+        nombre: document.getElementById('f-nombre').value,
+        contacto: document.getElementById('f-contacto').value,
+        telefono: document.getElementById('f-telefono').value,
+        email: document.getElementById('f-email').value,
+        documento_identidad: document.getElementById('f-documento').value
+      };
+
+      try {
+        await apiFetch('/entities', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        close();
+        loadProviders();
+      } catch (err) {
+        alert('Error al guardar: ' + err.message);
+      }
+    });
+  });
+
+  function close() {
+    document.getElementById('provider-modal').classList.remove('open');
+  }
+
+  async function loadProviders() {
+    const tbody = document.getElementById('proveedores-tbody');
+    try {
+      const res = await apiFetch('/entities?tipo=Proveedor');
+      // entityController.js doesn't filter by query yet, we filter on frontend or modify backend.
+      // We will filter here for safety if backend returns all.
+      const data = res.data.filter(e => e.tipo === 'Proveedor');
+      
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">No hay proveedores registrados</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(p => `
+        <tr>
+          <td style="font-weight:600">${p.nombre}</td>
+          <td>${p.contacto || '-'}</td>
+          <td style="font-size:13px">${p.email || '-'}<br><span style="color:var(--text-muted)">${p.telefono || ''}</span></td>
+          <td style="font-family:monospace">${p.documento_identidad || '-'}</td>
+          <td>
+            <button class="btn btn-ghost btn-sm" title="Editar"><i class="fa fa-edit"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red">Error: ${e.message}</td></tr>`;
+    }
+  }
 </script>
 </body>
 </html>
