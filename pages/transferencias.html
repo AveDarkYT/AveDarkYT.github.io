@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transferencias | InventarioPro</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="toast-container" id="toast-container" role="alert" aria-live="polite"></div>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📦</div>
+      <div><h1>InventarioPro</h1><span>ERP Avanzado</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="../index.html" class="nav-item"><i class="fa fa-chart-line"></i> Dashboard</a>
+      <a href="productos.html" class="nav-item"><i class="fa fa-box"></i> Productos</a>
+      <a href="transferencias.html" class="nav-item active"><i class="fa fa-exchange-alt"></i> Transferencias</a>
+      <a href="importar.html" class="nav-item"><i class="fa fa-file-upload"></i> Importar CSV</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h2>Transferencias Multi-Almacén</h2>
+        <p>Mueve stock entre diferentes ubicaciones físicas de manera segura</p>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <div class="card-header">
+          <div class="card-title">Nueva Transferencia</div>
+        </div>
+        <div class="card-body">
+          <form id="transfer-form">
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label for="product_id">Producto (ID o SKU):</label>
+              <input type="text" id="product_id" class="form-control" required placeholder="Ej. 60d5ecb8b5...">
+            </div>
+            
+            <div style="display:flex; gap:16px; margin-bottom: 16px;">
+              <div class="form-group" style="flex:1">
+                <label for="source_location">Almacén Origen (ID):</label>
+                <input type="text" id="source_location" class="form-control" required>
+              </div>
+              
+              <div style="display:flex; align-items:flex-end; padding-bottom:10px">
+                <i class="fa fa-arrow-right" style="color:var(--text-muted)"></i>
+              </div>
+
+              <div class="form-group" style="flex:1">
+                <label for="dest_location">Almacén Destino (ID):</label>
+                <input type="text" id="dest_location" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label for="quantity">Cantidad a Mover:</label>
+              <input type="number" id="quantity" class="form-control" required min="1">
+            </div>
+
+            <div style="text-align:right">
+              <button type="submit" class="btn btn-primary">
+                <i class="fa fa-exchange-alt"></i> Ejecutar Transferencia
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+  document.getElementById('transfer-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const payload = {
+      product_id: document.getElementById('product_id').value,
+      source_location_id: document.getElementById('source_location').value,
+      dest_location_id: document.getElementById('dest_location').value,
+      quantity: parseInt(document.getElementById('quantity').value, 10)
+    };
+
+    try {
+      const response = await apiFetch('/transfers', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (response.success) {
+        showToast('success', 'Éxito', response.message);
+        e.target.reset();
+      } else {
+        throw new Error(response.message || 'Error en la transferencia');
+      }
+    } catch (error) {
+      showToast('error', 'Error', error.message);
+    }
+  });
+</script>
+</body>
+</html>

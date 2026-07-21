@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importar CSV | InventarioPro</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .upload-zone {
+      border: 2px dashed rgba(59, 130, 246, 0.5);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      background: rgba(59, 130, 246, 0.05);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: var(--accent-blue);
+    }
+    .upload-icon {
+      font-size: 48px;
+      color: var(--accent-blue);
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast-container" id="toast-container" role="alert" aria-live="polite"></div>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📦</div>
+      <div><h1>InventarioPro</h1><span>ERP Avanzado</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="../index.html" class="nav-item"><i class="fa fa-chart-line"></i> Dashboard</a>
+      <a href="productos.html" class="nav-item"><i class="fa fa-box"></i> Productos</a>
+      <a href="transferencias.html" class="nav-item"><i class="fa fa-exchange-alt"></i> Transferencias</a>
+      <a href="importar.html" class="nav-item active"><i class="fa fa-file-upload"></i> Importar CSV</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h2>Importación Masiva (CSV)</h2>
+        <p>Añade o actualiza el catálogo rápidamente</p>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <div class="card-header">
+          <div class="card-title">Sube tu archivo CSV</div>
+        </div>
+        <div class="card-body">
+          <div class="upload-zone" id="drop-zone">
+            <i class="fa fa-cloud-upload-alt upload-icon"></i>
+            <h3>Arrastra y suelta tu archivo aquí</h3>
+            <p style="color:var(--text-muted); margin-top:8px">o haz clic para seleccionar (solo .csv)</p>
+            <input type="file" id="csv-file" accept=".csv" style="display:none">
+          </div>
+
+          <div id="upload-status" style="margin-top: 20px; display: none;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+              <span>Procesando...</span>
+              <span id="progress-text">0%</span>
+            </div>
+            <div style="background:var(--bg-primary); border-radius:10px; height:8px; overflow:hidden">
+              <div id="progress-bar" style="background:var(--accent-blue); height:100%; width:0%; transition:width 0.3s"></div>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; text-align:right">
+            <button class="btn btn-primary" id="btn-upload" disabled>
+              <i class="fa fa-upload"></i> Procesar Importación
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('csv-file');
+  const btnUpload = document.getElementById('btn-upload');
+  let selectedFile = null;
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length) {
+      handleFile(e.target.files[0]);
+    }
+  });
+
+  function handleFile(file) {
+    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+      showToast('error', 'Error', 'Solo se permiten archivos CSV');
+      return;
+    }
+    selectedFile = file;
+    dropZone.querySelector('h3').textContent = file.name;
+    btnUpload.disabled = false;
+  }
+
+  btnUpload.addEventListener('click', async () => {
+    if (!selectedFile) return;
+    
+    document.getElementById('upload-status').style.display = 'block';
+    document.getElementById('progress-bar').style.width = '50%';
+    btnUpload.disabled = true;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const token = Auth.getToken();
+      const response = await fetch(`${API_BASE}/imports/csv`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+      document.getElementById('progress-bar').style.width = '100%';
+      document.getElementById('progress-text').textContent = '100%';
+
+      if (data.success) {
+        showToast('success', 'Completado', data.message);
+        if (data.errors && data.errors.length > 0) {
+          console.warn("Errores parciales:", data.errors);
+          showToast('warning', 'Aviso', 'Algunas filas fallaron. Revisa la consola.');
+        }
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      showToast('error', 'Error en importación', error.message);
+      document.getElementById('upload-status').style.display = 'none';
+      btnUpload.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
