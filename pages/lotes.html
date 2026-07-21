@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InventarioPro | Módulo en Construcción</title>
+  <title>InventarioPro | Gestión de Lotes y Caducidad</title>
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -14,92 +14,79 @@
     <nav class="sidebar-nav">
       <!-- PRINCIPAL -->
       <p class="nav-section-title">PRINCIPAL</p>
-      <a href="../index.html" class="nav-item" id="nav-dashboard">
-        <span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio
-      </a>
-      <a href="pos.html" class="nav-item" id="nav-pos">
-        <span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta
-      </a>
+      <a href="../index.html" class="nav-item"><span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio</a>
+      <a href="pos.html" class="nav-item"><span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta</a>
 
       <!-- INVENTARIO -->
       <p class="nav-section-title">INVENTARIO</p>
-      <a href="productos.html" class="nav-item" id="nav-productos">
-        <span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos
-      </a>
-      <a href="categorias.html" class="nav-item" id="nav-categorias">
-        <span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías
-      </a>
-      <a href="unidades.html" class="nav-item" id="nav-unidades">
-        <span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades
-      </a>
-      <a href="marcas.html" class="nav-item" id="nav-marcas">
-        <span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas
-      </a>
-      <a href="inventario.html" class="nav-item" id="nav-inventario">
-        <span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario
-      </a>
-      <a href="stock-bajo.html" class="nav-item" id="nav-stock-bajo">
-        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo
-      </a>
-      <a href="lotes.html" class="nav-item" id="nav-lotes">
-        <span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes
-      </a>
-      <a href="etiquetas.html" class="nav-item" id="nav-etiquetas">
-        <span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas
-      </a>
+      <a href="productos.html" class="nav-item"><span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos</a>
+      <a href="categorias.html" class="nav-item"><span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías</a>
+      <a href="unidades.html" class="nav-item"><span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades</a>
+      <a href="marcas.html" class="nav-item"><span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas</a>
+      <a href="inventario.html" class="nav-item"><span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario</a>
+      <a href="stock-bajo.html" class="nav-item"><span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo</a>
+      <a href="lotes.html" class="nav-item active"><span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes</a>
+      <a href="etiquetas.html" class="nav-item"><span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas</a>
 
-      <!-- VENTAS -->
+      <!-- VENTAS & COMPRAS -->
       <p class="nav-section-title">VENTAS</p>
-      <a href="ventas-historial.html" class="nav-item" id="nav-ventas-historial">
-        <span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas
-      </a>
-
-      <!-- COMPRAS -->
+      <a href="ventas-historial.html" class="nav-item"><span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas</a>
       <p class="nav-section-title">COMPRAS</p>
-      <a href="compras.html" class="nav-item" id="nav-compras">
-        <span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras
-      </a>
-      <a href="proveedores.html" class="nav-item" id="nav-proveedores">
-        <span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores
-      </a>
-      <a href="pagos.html" class="nav-item" id="nav-pagos">
-        <span class="nav-icon"><i class="fa fa-money-bill-wave"></i></span> Pagos
-      </a>
+      <a href="compras.html" class="nav-item"><span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras</a>
+      <a href="proveedores.html" class="nav-item"><span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores</a>
+      <a href="pagos.html" class="nav-item"><span class="nav-icon"><i class="fa fa-money-bill-wave"></i></span> Pagos</a>
 
       <!-- OTROS -->
       <p class="nav-section-title">OTROS</p>
-      <a href="reportes.html" class="nav-item" id="nav-reportes">
-        <span class="nav-icon"><i class="fa fa-chart-line"></i></span> Reportes
-      </a>
-      <a href="configuracion.html" class="nav-item" id="nav-configuracion">
-        <span class="nav-icon"><i class="fa fa-cog"></i></span> Configuración
-      </a>
+      <a href="reportes.html" class="nav-item"><span class="nav-icon"><i class="fa fa-chart-line"></i></span> Reportes</a>
+      <a href="configuracion.html" class="nav-item"><span class="nav-icon"><i class="fa fa-cog"></i></span> Configuración</a>
     </nav>
   </aside>
 
   <main class="main-content">
     <header class="topbar">
-      <div class="topbar-title"><h2>🚧 Módulo en Construcción</h2><p>Esta sección estará disponible próximamente</p></div>
+      <div class="topbar-title"><h2>📦 Control de Lotes</h2><p>Trazabilidad por fecha de caducidad y número de lote</p></div>
     </header>
 
     <div class="page-content">
-      <div class="card" style="text-align:center; padding: 60px 20px;">
-        <i class="fa fa-tools" style="font-size: 64px; color: var(--accent-blue); margin-bottom: 24px;"></i>
-        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 12px;">¡Trabajando en ello!</h2>
-        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 24px;">
-          Actualmente estamos desarrollando este módulo para brindarte las mejores herramientas. 
-          Vuelve pronto para descubrir las nuevas funcionalidades.
-        </p>
-        <button class="btn btn-primary" onclick="history.back()" style="margin: 0 auto;">
-          <i class="fa fa-arrow-left"></i> Volver Atrás
-        </button>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Mercancía Perecedera / Lotes (UI Demo)</div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Lote</th>
+                <th>Producto</th>
+                <th>Stock</th>
+                <th>Fecha Caducidad</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:monospace;font-weight:700">L-2026-001</td>
+                <td>Leche Entera 1L</td>
+                <td>50 PZA</td>
+                <td>2026-08-01</td>
+                <td><span class="badge" style="background:var(--accent-yellow)">Próximo a Vencer</span></td>
+              </tr>
+              <tr>
+                <td style="font-family:monospace;font-weight:700">L-2026-002</td>
+                <td>Queso Fresco</td>
+                <td>20 KG</td>
+                <td>2026-12-15</td>
+                <td><span class="badge" style="background:var(--accent-green)">Óptimo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
 </div>
 <script src="../js/api.js"></script>
-<script>
-  if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; }
-</script>
+<script>if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; }</script>
 </body>
 </html>
