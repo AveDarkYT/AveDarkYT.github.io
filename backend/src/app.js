@@ -65,6 +65,8 @@ app.use('/api/alerts',    alertRoutes);
 app.use('/api/dispatch',  dispatchRoutes);
 app.use('/api/orders',    orderRoutes);
 app.use('/api/entities',  entityRoutes);
+app.use('/api/imports',   require('./routes/imports'));
+app.use('/api/transfers', require('./routes/transfers'));
 
 // ── Frontend ────────────────────────────────────
 app.use(express.static(path.join(__dirname, '../../frontend')));
