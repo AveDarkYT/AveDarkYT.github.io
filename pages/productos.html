@@ -29,16 +29,68 @@
   <aside class="sidebar">
     <div class="sidebar-logo"><div class="logo-icon">📦</div><div><h1>InventarioPro</h1><span>Sistema de Almacén</span></div></div>
     <nav class="sidebar-nav">
-      <p class="nav-section-title">Principal</p>
-      <a href="../index.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
-      <a href="productos.html" class="nav-item active"><span class="nav-icon">📦</span> Productos</a>
-      <a href="movimientos.html" class="nav-item"><span class="nav-icon">🔄</span> Movimientos</a>
-      <a href="conduces.html" class="nav-item"><span class="nav-icon">📄</span> Conduces</a>
-      <p class="nav-section-title">Operaciones</p>
-      <a href="scanner.html" class="nav-item"><span class="nav-icon">📡</span> Escáner</a>
-      <a href="conteo.html" class="nav-item"><span class="nav-icon">📝</span> Conteo Físico</a>
-      <a href="alertas.html" class="nav-item"><span class="nav-icon">🔔</span> Alertas
-        <span class="nav-badge" id="alert-badge" style="display:none">0</span></a>
+      <!-- PRINCIPAL -->
+      <p class="nav-section-title">PRINCIPAL</p>
+      <a href="../index.html" class="nav-item" id="nav-dashboard">
+        <span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio
+      </a>
+      <a href="pos.html" class="nav-item" id="nav-pos">
+        <span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta
+      </a>
+
+      <!-- INVENTARIO -->
+      <p class="nav-section-title">INVENTARIO</p>
+      <a href="productos.html" class="nav-item active" id="nav-productos">
+        <span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos
+      </a>
+      <a href="categorias.html" class="nav-item" id="nav-categorias">
+        <span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías
+      </a>
+      <a href="unidades.html" class="nav-item" id="nav-unidades">
+        <span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades
+      </a>
+      <a href="marcas.html" class="nav-item" id="nav-marcas">
+        <span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas
+      </a>
+      <a href="inventario.html" class="nav-item" id="nav-inventario">
+        <span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario
+      </a>
+      <a href="stock-bajo.html" class="nav-item" id="nav-stock-bajo">
+        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo
+      </a>
+      <a href="lotes.html" class="nav-item" id="nav-lotes">
+        <span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes
+      </a>
+      <a href="etiquetas.html" class="nav-item" id="nav-etiquetas">
+        <span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas
+      </a>
+
+      <!-- VENTAS -->
+      <p class="nav-section-title">VENTAS</p>
+      <a href="ventas-historial.html" class="nav-item" id="nav-ventas-historial">
+        <span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas
+      </a>
+
+      <!-- COMPRAS -->
+      <p class="nav-section-title">COMPRAS</p>
+      <a href="compras.html" class="nav-item" id="nav-compras">
+        <span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras
+      </a>
+      <a href="proveedores.html" class="nav-item" id="nav-proveedores">
+        <span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores
+      </a>
+      <a href="pagos.html" class="nav-item" id="nav-pagos">
+        <span class="nav-icon"><i class="fa fa-money-bill-wave"></i></span> Pagos
+      </a>
+
+      <!-- OTROS -->
+      <p class="nav-section-title">OTROS</p>
+      <a href="reportes.html" class="nav-item" id="nav-reportes">
+        <span class="nav-icon"><i class="fa fa-chart-line"></i></span> Reportes
+      </a>
+      <a href="configuracion.html" class="nav-item" id="nav-configuracion">
+        <span class="nav-icon"><i class="fa fa-cog"></i></span> Configuración
+      </a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-card"><div class="user-avatar" id="user-avatar">A</div>
@@ -99,52 +151,107 @@
 <!-- Modal Nuevo/Editar Producto -->
 <div class="modal-overlay" id="product-modal" role="dialog" aria-modal="true" aria-label="Formulario de producto">
   <div class="modal-box">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-      <h3 id="modal-title" style="font-size:18px;font-weight:700">Nuevo Producto</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <h3 id="modal-title" style="font-size:18px;font-weight:700">Nuevo Producto</h3>
+        <p id="modal-subtitle" style="font-size:13px;color:var(--text-muted);display:none;"></p>
+      </div>
       <button class="btn-icon" id="btn-close-modal" aria-label="Cerrar modal"><i class="fa fa-times"></i></button>
     </div>
-    <form id="product-form" novalidate>
-      <div class="form-grid" style="margin-bottom:16px">
-        <div class="form-group"><label class="form-label" for="f-nombre">Nombre *</label>
-          <input type="text" class="form-control" id="f-nombre" required></div>
-        <div class="form-group"><label class="form-label" for="f-sku">SKU *</label>
-          <input type="text" class="form-control" id="f-sku" required placeholder="HELEC-001"></div>
+
+    <!-- Tabs Nav -->
+    <div class="tabs-nav" style="display:flex;gap:16px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:20px;display:none;" id="modal-tabs">
+      <button class="tab-btn active" onclick="switchTab('generales')" id="tab-generales">Generales</button>
+      <button class="tab-btn" onclick="switchTab('historial')" id="tab-historial">Histórico proveedores</button>
+    </div>
+
+    <!-- Tab 1: Generales (Formulario) -->
+    <div id="pane-generales" class="tab-pane active">
+      <form id="product-form" novalidate>
+        <div class="form-grid" style="margin-bottom:16px">
+          <div class="form-group"><label class="form-label" for="f-nombre">Nombre *</label>
+            <input type="text" class="form-control" id="f-nombre" required></div>
+          <div class="form-group"><label class="form-label" for="f-sku">SKU *</label>
+            <input type="text" class="form-control" id="f-sku" required placeholder="HELEC-001"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:16px"><label class="form-label" for="f-descripcion">Descripción</label>
+          <input type="text" class="form-control" id="f-descripcion"></div>
+        <div class="form-grid" style="margin-bottom:16px">
+          <div class="form-group"><label class="form-label" for="f-barcode">Código de Barras</label>
+            <input type="text" class="form-control" id="f-barcode" placeholder="7501234567890"></div>
+          <div class="form-group"><label class="form-label" for="f-categoria">Categoría *</label>
+            <select class="form-control" id="f-categoria" required>
+              <option value="">Seleccionar...</option>
+            </select></div>
+        </div>
+        <div class="form-grid" style="margin-bottom:16px">
+          <div class="form-group"><label class="form-label" for="f-pasillo">Pasillo</label>
+            <input type="text" class="form-control" id="f-pasillo" placeholder="A"></div>
+          <div class="form-group"><label class="form-label" for="f-estante">Estante/Nivel</label>
+            <input type="text" class="form-control" id="f-estante" placeholder="2-3"></div>
+        </div>
+        <div class="form-grid" style="margin-bottom:16px">
+          <div class="form-group"><label class="form-label" for="f-stock-inicial">Stock Inicial</label>
+            <input type="number" class="form-control" id="f-stock-inicial" value="0" min="0"></div>
+          <div class="form-group"><label class="form-label" for="f-punto-reorden">Punto de Reorden</label>
+            <input type="number" class="form-control" id="f-punto-reorden" value="10" min="0"></div>
+        </div>
+        <div class="form-grid" style="margin-bottom:24px">
+          <div class="form-group"><label class="form-label" for="f-precio-costo">Precio Costo</label>
+            <input type="number" class="form-control" id="f-precio-costo" value="0" min="0"></div>
+          <div class="form-group"><label class="form-label" for="f-precio-venta">Precio Venta</label>
+            <input type="number" class="form-control" id="f-precio-venta" value="0" min="0"></div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+          <button type="button" class="btn btn-ghost" id="btn-cancel-modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-product">
+            <i class="fa fa-save"></i> Guardar Producto
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab 2: Histórico proveedores -->
+    <div id="pane-historial" class="tab-pane" style="display:none;">
+      <!-- KPIs -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+        <div class="kpi-card blue" style="padding:12px;">
+          <div class="kpi-label" style="font-size:11px;">Última Compra</div>
+          <div class="kpi-value" id="hkpi-ultima" style="font-size:15px;margin:4px 0;">–</div>
+          <div class="kpi-footer" id="hkpi-ultima-sub" style="font-size:11px;">-</div>
+        </div>
+        <div class="kpi-card purple" style="padding:12px;">
+          <div class="kpi-label" style="font-size:11px;">Prov. Frecuente</div>
+          <div class="kpi-value" id="hkpi-frecuente" style="font-size:15px;margin:4px 0;">–</div>
+          <div class="kpi-footer" id="hkpi-frecuente-sub" style="font-size:11px;">-</div>
+        </div>
+        <div class="kpi-card yellow" style="padding:12px;">
+          <div class="kpi-label" style="font-size:11px;">Variación de Costo</div>
+          <div class="kpi-value" id="hkpi-variacion" style="font-size:15px;margin:4px 0;">–</div>
+          <div class="kpi-footer" style="font-size:11px;">vs penúltima compra</div>
+        </div>
       </div>
-      <div class="form-group" style="margin-bottom:16px"><label class="form-label" for="f-descripcion">Descripción</label>
-        <input type="text" class="form-control" id="f-descripcion"></div>
-      <div class="form-grid" style="margin-bottom:16px">
-        <div class="form-group"><label class="form-label" for="f-barcode">Código de Barras</label>
-          <input type="text" class="form-control" id="f-barcode" placeholder="7501234567890"></div>
-        <div class="form-group"><label class="form-label" for="f-categoria">Categoría *</label>
-          <select class="form-control" id="f-categoria" required>
-            <option value="">Seleccionar...</option>
-          </select></div>
+      
+      <!-- Tabla -->
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Proveedor</th>
+              <th>Documento</th>
+              <th>F. Emisión</th>
+              <th>F. Registro</th>
+              <th>Cant.</th>
+              <th>Costo Unit.</th>
+              <th>Tendencia</th>
+            </tr>
+          </thead>
+          <tbody id="historial-tbody">
+            <tr><td colspan="7" style="text-align:center;padding:24px"><span class="spinner"></span></td></tr>
+          </tbody>
+        </table>
       </div>
-      <div class="form-grid" style="margin-bottom:16px">
-        <div class="form-group"><label class="form-label" for="f-pasillo">Pasillo</label>
-          <input type="text" class="form-control" id="f-pasillo" placeholder="A"></div>
-        <div class="form-group"><label class="form-label" for="f-estante">Estante/Nivel</label>
-          <input type="text" class="form-control" id="f-estante" placeholder="2-3"></div>
-      </div>
-      <div class="form-grid" style="margin-bottom:16px">
-        <div class="form-group"><label class="form-label" for="f-stock-inicial">Stock Inicial</label>
-          <input type="number" class="form-control" id="f-stock-inicial" value="0" min="0"></div>
-        <div class="form-group"><label class="form-label" for="f-punto-reorden">Punto de Reorden</label>
-          <input type="number" class="form-control" id="f-punto-reorden" value="10" min="0"></div>
-      </div>
-      <div class="form-grid" style="margin-bottom:24px">
-        <div class="form-group"><label class="form-label" for="f-precio-costo">Precio Costo</label>
-          <input type="number" class="form-control" id="f-precio-costo" value="0" min="0"></div>
-        <div class="form-group"><label class="form-label" for="f-precio-venta">Precio Venta</label>
-          <input type="number" class="form-control" id="f-precio-venta" value="0" min="0"></div>
-      </div>
-      <div style="display:flex;gap:12px;justify-content:flex-end">
-        <button type="button" class="btn btn-ghost" id="btn-cancel-modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary" id="btn-save-product">
-          <i class="fa fa-save"></i> Guardar Producto
-        </button>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -245,9 +352,19 @@ async function loadProducts() {
   }
 }
 
+function switchTab(tabId) {
+  document.getElementById('pane-generales').style.display = tabId === 'generales' ? 'block' : 'none';
+  document.getElementById('pane-historial').style.display = tabId === 'historial' ? 'block' : 'none';
+  document.getElementById('tab-generales').classList.toggle('active', tabId === 'generales');
+  document.getElementById('tab-historial').classList.toggle('active', tabId === 'historial');
+}
+
 function openNewModal() {
   editingId = null;
   document.getElementById('modal-title').textContent = 'Nuevo Producto';
+  document.getElementById('modal-subtitle').style.display = 'none';
+  document.getElementById('modal-tabs').style.display = 'none'; // No historial para nuevo producto
+  switchTab('generales');
   document.getElementById('product-form').reset();
   document.getElementById('product-modal').classList.add('open');
 }
@@ -260,14 +377,85 @@ async function editProduct(id) {
     const p = res.data.producto;
     editingId = id;
     document.getElementById('modal-title').textContent = 'Editar Producto';
+    document.getElementById('modal-subtitle').textContent = `SKU: ${p.sku} | ${p.nombre}`;
+    document.getElementById('modal-subtitle').style.display = 'block';
+    document.getElementById('modal-tabs').style.display = 'flex';
+    switchTab('generales');
+
     document.getElementById('f-nombre').value    = p.nombre || '';
     document.getElementById('f-sku').value       = p.sku    || '';
     document.getElementById('f-descripcion').value = p.descripcion || '';
     document.getElementById('f-barcode').value   = p.codigo_barras || '';
     document.getElementById('f-pasillo').value   = p.ubicacion?.pasillo || '';
     document.getElementById('f-estante').value   = p.ubicacion?.estante || '';
+    
     document.getElementById('product-modal').classList.add('open');
+    cargarHistorialCompras(id);
   } catch(e) { showToast('error', 'Error', e.message); }
+}
+
+async function cargarHistorialCompras(id) {
+  const tbody = document.getElementById('historial-tbody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px"><span class="spinner"></span></td></tr>';
+  
+  // Limpiar KPIs
+  document.getElementById('hkpi-ultima').textContent = '-';
+  document.getElementById('hkpi-ultima-sub').textContent = '-';
+  document.getElementById('hkpi-frecuente').textContent = '-';
+  document.getElementById('hkpi-frecuente-sub').textContent = '-';
+  document.getElementById('hkpi-variacion').textContent = '-';
+  document.getElementById('hkpi-variacion').style.color = 'inherit';
+
+  try {
+    const res = await apiFetch(`/products/${id}/historial-compras`);
+    const hist = res.data.historial;
+    const kpis = res.data.kpis;
+
+    if (kpis.ultima_compra) {
+      document.getElementById('hkpi-ultima').textContent = `$${kpis.ultima_compra.costo_unitario.toFixed(2)}`;
+      document.getElementById('hkpi-ultima-sub').textContent = `${kpis.ultima_compra.proveedor_nombre} · ${new Date(kpis.ultima_compra.fecha_registro).toLocaleDateString()}`;
+    }
+    if (kpis.proveedor_frecuente) {
+      document.getElementById('hkpi-frecuente').textContent = kpis.proveedor_frecuente.nombre;
+      document.getElementById('hkpi-frecuente-sub').textContent = `${kpis.proveedor_frecuente.conteo} compras registradas`;
+    }
+    if (kpis.variacion_costo !== 0) {
+      const varTxt = kpis.variacion_costo > 0 ? `+${kpis.variacion_costo.toFixed(2)}%` : `${kpis.variacion_costo.toFixed(2)}%`;
+      document.getElementById('hkpi-variacion').textContent = varTxt;
+      document.getElementById('hkpi-variacion').style.color = kpis.variacion_costo > 0 ? 'var(--accent-red)' : 'var(--accent-green)';
+    }
+
+    if (!hist || hist.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">No hay compras registradas para este producto</td></tr>';
+      return;
+    }
+
+    let prevCosto = null;
+    tbody.innerHTML = hist.map((row, i) => {
+      // Calcular tendencia visual respecto a la fila anterior (que es más antigua)
+      let tendencia = '—';
+      let color = 'inherit';
+      if (i < hist.length - 1) {
+        const costoAnt = hist[i+1].costo_unitario;
+        if (row.costo_unitario > costoAnt) { tendencia = '▲'; color = 'var(--accent-red)'; }
+        else if (row.costo_unitario < costoAnt) { tendencia = '▼'; color = 'var(--accent-green)'; }
+        else { tendencia = '■'; color = 'var(--text-muted)'; }
+      }
+
+      return `<tr>
+        <td style="font-weight:600">${row.proveedor_nombre}</td>
+        <td style="font-family:monospace">${row.numero_documento||'N/A'}</td>
+        <td style="font-size:12px">${row.fecha_emision ? new Date(row.fecha_emision).toLocaleDateString() : '—'}</td>
+        <td style="font-size:12px">${new Date(row.fecha_registro).toLocaleDateString()}</td>
+        <td style="font-weight:700">${row.cantidad}</td>
+        <td style="font-family:monospace">$${row.costo_unitario.toFixed(2)}</td>
+        <td style="color:${color};text-align:center;font-size:14px" title="Respecto a compra anterior">${tendencia}</td>
+      </tr>`;
+    }).join('');
+
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--accent-red)">Error: ${e.message}</td></tr>`;
+  }
 }
 
 async function saveProduct(e) {

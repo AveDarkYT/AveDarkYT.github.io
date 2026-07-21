@@ -116,3 +116,101 @@ exports.eliminar = async (req, res, next) => {
     return res.json({ success: true, message: 'Producto desactivado correctamente' });
   } catch (error) { next(error); }
 };
+
+// GET /api/products/:id/historial-compras
+exports.obtenerHistorialCompras = async (req, res, next) => {
+  try {
+    const mongoose = require('mongoose');
+    const Order = require('../models/Order');
+    const productId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ success: false, message: 'ID de producto inválido' });
+    }
+
+    const historial = await Order.aggregate([
+      // 1. Filtrar solo Órdenes de 'Compra' completadas que contengan nuestro producto
+      { $match: { 
+          type: 'Compra', 
+          status: 'Recibido', 
+          'items.product_id': new mongoose.Types.ObjectId(productId) 
+      } },
+      
+      // 2. Desglosar el array de items y quedarnos solo con el producto en cuestión
+      { $unwind: '$items' },
+      { $match: { 'items.product_id': new mongoose.Types.ObjectId(productId) } },
+
+      // 3. Hacer un "SQL JOIN" (lookup) con la tabla de Entidades (Proveedores)
+      {
+        $lookup: {
+          from: 'entities', // nombre de la colección en minúsculas y plural
+          localField: 'entity_id',
+          foreignField: '_id',
+          as: 'proveedor'
+        }
+      },
+      { $unwind: { path: '$proveedor', preserveNullAndEmptyArrays: true } },
+      
+      // 4. Ordenar cronológicamente (más reciente primero)
+      { $sort: { createdAt: -1 } },
+      
+      // 5. Proyectar (Seleccionar) columnas
+      {
+        $project: {
+          _id: 1,
+          numero_documento: '$order_number',
+          fecha_emision: '$expected_date',
+          fecha_registro: '$createdAt',
+          proveedor_nombre: { $ifNull: ['$proveedor.name', 'Proveedor Desconocido'] },
+          proveedor_id: '$proveedor._id',
+          cantidad: '$items.received_qty',
+          costo_unitario: '$items.unit_cost',
+          tipo: '$type'
+        }
+      }
+    ]);
+
+    // Calcular KPIs
+    let ultima_compra = null;
+    let proveedor_frecuente = null;
+    let variacion_costo = 0;
+
+    if (historial.length > 0) {
+      ultima_compra = historial[0];
+      
+      if (historial.length > 1) {
+        const penultima = historial[1];
+        if (penultima.costo_unitario > 0) {
+          variacion_costo = ((ultima_compra.costo_unitario - penultima.costo_unitario) / penultima.costo_unitario) * 100;
+        }
+      }
+
+      // Frecuencia
+      const freqMap = {};
+      historial.forEach(h => {
+        const pName = h.proveedor_nombre;
+        freqMap[pName] = (freqMap[pName] || 0) + 1;
+      });
+      let maxFreq = 0;
+      for (const [nombre, count] of Object.entries(freqMap)) {
+        if (count > maxFreq) {
+          maxFreq = count;
+          proveedor_frecuente = { nombre, conteo: count };
+        }
+      }
+    }
+
+    return res.json({ 
+      success: true, 
+      data: {
+        historial,
+        kpis: {
+          ultima_compra,
+          variacion_costo,
+          proveedor_frecuente
+        }
+      }
+    });
+  } catch (error) { next(error); }
+};
+

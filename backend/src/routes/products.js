@@ -9,6 +9,7 @@ router.use(protect);
 
 router.get('/',    ctrl.obtenerTodos);
 router.get('/:id', ctrl.obtenerPorId);
+router.get('/:id/historial-compras', ctrl.obtenerHistorialCompras);
 router.post('/',   restrictTo('admin', 'operador'), ctrl.crear);
 router.put('/:id', restrictTo('admin', 'operador'), ctrl.actualizar);
 router.delete('/:id', restrictTo('admin'),          ctrl.eliminar);

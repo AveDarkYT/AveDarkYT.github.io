@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InventarioPro | Generador de Etiquetas</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <style>
+    .label-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .label-card {
+      background: #fff;
+      border: 1px dashed #ccc;
+      padding: 16px;
+      text-align: center;
+      color: #000;
+    }
+    .label-card p {
+      margin: 4px 0;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .label-card svg {
+      max-width: 100%;
+      height: auto;
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      .label-grid { display: block; }
+      .label-card { 
+        display: inline-block; 
+        width: 4cm; height: 3cm; 
+        margin: 0.1cm; 
+        border: none;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon">📦</div><div><h1>InventarioPro</h1><span>Sistema de Almacén</span></div></div>
+    <nav class="sidebar-nav">
+      <!-- PRINCIPAL -->
+      <p class="nav-section-title">PRINCIPAL</p>
+      <a href="../index.html" class="nav-item" id="nav-dashboard">
+        <span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio
+      </a>
+      <a href="pos.html" class="nav-item" id="nav-pos">
+        <span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta
+      </a>
+
+      <!-- INVENTARIO -->
+      <p class="nav-section-title">INVENTARIO</p>
+      <a href="productos.html" class="nav-item" id="nav-productos">
+        <span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos
+      </a>
+      <a href="categorias.html" class="nav-item" id="nav-categorias">
+        <span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías
+      </a>
+      <a href="unidades.html" class="nav-item" id="nav-unidades">
+        <span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades
+      </a>
+      <a href="marcas.html" class="nav-item" id="nav-marcas">
+        <span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas
+      </a>
+      <a href="inventario.html" class="nav-item" id="nav-inventario">
+        <span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario
+      </a>
+      <a href="stock-bajo.html" class="nav-item" id="nav-stock-bajo">
+        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo
+      </a>
+      <a href="lotes.html" class="nav-item" id="nav-lotes">
+        <span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes
+      </a>
+      <a href="etiquetas.html" class="nav-item active" id="nav-etiquetas">
+        <span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas
+      </a>
+
+      <!-- VENTAS -->
+      <p class="nav-section-title">VENTAS</p>
+      <a href="ventas-historial.html" class="nav-item" id="nav-ventas-historial">
+        <span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas
+      </a>
+
+      <!-- COMPRAS -->
+      <p class="nav-section-title">COMPRAS</p>
+      <a href="compras.html" class="nav-item" id="nav-compras">
+        <span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras
+      </a>
+      <a href="proveedores.html" class="nav-item" id="nav-proveedores">
+        <span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores
+      </a>
+      <a href="pagos.html" class="nav-item" id="nav-pagos">
+        <span class="nav-icon"><i class="fa fa-money-bill-wave"></i></span> Pagos
+      </a>
+
+      <!-- OTROS -->
+      <p class="nav-section-title">OTROS</p>
+      <a href="reportes.html" class="nav-item" id="nav-reportes">
+        <span class="nav-icon"><i class="fa fa-chart-line"></i></span> Reportes
+      </a>
+      <a href="configuracion.html" class="nav-item" id="nav-configuracion">
+        <span class="nav-icon"><i class="fa fa-cog"></i></span> Configuración
+      </a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-title"><h2>🏷️ Generador de Etiquetas</h2><p>Selecciona productos e imprime sus códigos de barras</p></div>
+    </header>
+
+    <div class="page-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Configuración de Impresión</div>
+          <button class="btn btn-primary" onclick="window.print()">
+            <i class="fa fa-print"></i> Imprimir Etiquetas
+          </button>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:12px;margin-bottom:16px;">
+            <input type="text" class="form-control" id="search-prod" placeholder="Buscar producto para agregar..." style="max-width:300px;">
+            <button class="btn btn-ghost" onclick="searchProduct()">Buscar</button>
+          </div>
+          
+          <div id="print-area" class="label-grid">
+            <!-- Etiquetas generadas irán aquí -->
+            <div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted);">
+              Busca y selecciona un producto para generar sus etiquetas.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+  if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; }
+  
+  async function searchProduct() {
+    const q = document.getElementById('search-prod').value;
+    if(!q) return;
+    try {
+      const res = await API.getProducts(\`busqueda=\${encodeURIComponent(q)}&limit=1\`);
+      if(res.data && res.data.length > 0) {
+        addLabel(res.data[0]);
+      } else {
+        alert('No se encontraron productos');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function addLabel(prod) {
+    const code = prod.codigo_barras || prod.sku;
+    if(!code) return alert('El producto no tiene SKU ni Código de Barras');
+    
+    const container = document.getElementById('print-area');
+    if(container.innerHTML.includes('Busca y selecciona')) container.innerHTML = '';
+
+    const div = document.createElement('div');
+    div.className = 'label-card';
+    const svgId = 'barcode-' + Date.now();
+    div.innerHTML = \`
+      <p>\${prod.nombre}</p>
+      <svg id="\${svgId}"></svg>
+      <p>SKU: \${prod.sku}</p>
+    \`;
+    container.appendChild(div);
+
+    JsBarcode("#" + svgId, code, {
+      format: "CODE128",
+      width: 2,
+      height: 40,
+      displayValue: true
+    });
+  }
+</script>
+</body>
+</html>
