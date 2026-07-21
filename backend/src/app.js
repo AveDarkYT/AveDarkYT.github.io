@@ -28,6 +28,7 @@ app.use(cors({
     process.env.FRONTEND_URL || 'http://localhost:5500',
     'http://127.0.0.1:5500',
     'http://localhost:3001',
+    'https://avedarkyt.github.io', // Permitir GitHub Pages
     'null' // Para abrir archivos locales directamente
   ],
   credentials: true,

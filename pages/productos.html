@@ -311,14 +311,6 @@ async function deleteProduct(id, nombre) {
   } catch(err) { showToast('error', 'Error', err.message); }
 }
 
-// Alias necesario para productos (el endpoint de categorías aún no tiene una ruta dedicada)
-async function apiFetch(endpoint) {
-  const token = Auth.getToken();
-  const res = await fetch(`http://localhost:3000/api${endpoint}`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  return res.json();
-}
 </script>
 </body>
 </html>

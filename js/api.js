@@ -26,10 +26,19 @@ async function apiFetch(endpoint, options = {}) {
   const defaultHeaders = { 'Content-Type': 'application/json' };
   if (token) defaultHeaders['Authorization'] = `Bearer ${token}`;
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers: { ...defaultHeaders, ...(options.headers || {}) }
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers: { ...defaultHeaders, ...(options.headers || {}) }
+    });
+  } catch (err) {
+    if (err.name === 'TypeError' && err.message.includes('fetch')) {
+      showToast('warning', 'Conectando...', 'Conectando con el servidor, por favor espere unos segundos...', 10000);
+      throw new Error('Servidor despertando o desconectado. Espere un momento.');
+    }
+    throw err;
+  }
 
   const data = await response.json();
 
