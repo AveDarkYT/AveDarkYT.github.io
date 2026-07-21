@@ -4,7 +4,7 @@
  */
 'use strict';
 
-const API_BASE = '/api';
+const API_BASE = 'https://avedarkyt-github-io.onrender.com/api';
 
 // ── Token JWT ─────────────────────────────────────────────
 const Auth = {
