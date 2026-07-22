@@ -208,19 +208,7 @@ async function processScan(barcode) {
   } catch (err) {
     // ── Error ────────────────────────────────────────────
     stage?.classList.add('error-scan');
-    
-    // Si el error indica que no se encontró el producto, ofrecer crearlo
-    if (err.message.toLowerCase().includes('no encontrado') || err.message.toLowerCase().includes('not found')) {
-      if (confirm(`El código "${barcode}" no existe en el sistema. ¿Deseas crear un nuevo artículo ahora?`)) {
-        // Redirigir a la página de creación de producto con el código prellenado
-        window.location.href = `productos.html?action=new&barcode=${barcode}`;
-      } else {
-        showToast('warning', 'Escaneo Cancelado', `Código ${barcode} ignorado.`);
-      }
-    } else {
-      showToast('error', 'Error de Escaneo', err.message);
-    }
-    
+    showToast('error', 'Error de Escaneo', err.message);
     addToHistory(false, barcode, null, null);
   } finally {
     // ── CRÍTICO: Siempre retornar el foco al campo de escaneo ──

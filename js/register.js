@@ -7,10 +7,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   const errorMsg = document.getElementById('errorMsg');
   
   try {
-    // Usamos el archivo js/api.js si ya está incluido, o definimos la base
-    const baseURL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://avedarkyt-github-io.onrender.com/api';
-    
-    const res = await fetch(`${baseURL}/auth/register`, {
+    const res = await fetch('http://localhost:3000/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre, email, password, rol: 'admin' })
@@ -19,8 +16,8 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     const data = await res.json();
     
     if (data.success) {
-      localStorage.setItem('inv_token', data.data.token);
-      localStorage.setItem('inv_user', JSON.stringify(data.data.usuario));
+      localStorage.setItem('token', data.data.token);
+      localStorage.setItem('user', JSON.stringify(data.data.usuario));
       window.location.href = 'index.html';
     } else {
       errorMsg.textContent = data.message || 'Error en el registro';

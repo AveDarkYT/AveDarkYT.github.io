@@ -1,301 +1,287 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stockly | Dashboard</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>InventarioPro | Dashboard</title>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Custom Styles (Based on SB Admin 2 / Vue Reference Repo + Blue Theme) -->
+    <link href="css/styles.css" rel="stylesheet" />
+    <style>
+        #em_photo { height: 40px; width: 40px; border-radius: 4px; object-fit: cover; }
+    </style>
 </head>
-<body>
+<body class="sb-nav-fixed">
 
-  <!-- App Shell Wrapper -->
-  <div class="app-shell">
-    
-    <!-- Top Navbar Exact Replica -->
-    <header class="navbar">
-      <div class="nav-left">
-        <a href="index.html" class="brand">
-          <div class="brand-icon">
-            <i class="fa-solid fa-box-open"></i>
-          </div>
-          <span>Stockly</span>
+    <!-- Top Navbar -->
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark" id="topbar">
+        <a class="navbar-brand" href="index.html">
+            <i class="fas fa-box-open mr-2"></i> InventarioPro
         </a>
-        <nav class="nav-links">
-          <a href="index.html" class="nav-item active">Dashboard</a>
-          <a href="pages/inventario.html" class="nav-item">Inventario</a>
-          <a href="pages/compras.html" class="nav-item">Compras</a>
-          <a href="pages/pos.html" class="nav-item">Punto de Venta</a>
-          <a href="pages/proveedores.html" class="nav-item">Proveedores</a>
-        </nav>
-      </div>
-      
-      <div class="nav-right">
-        <!-- Bell Icon -->
-        <button style="color: var(--text-muted); font-size: 1.25rem;">
-          <i class="fa-regular fa-bell"></i>
-        </button>
-        <!-- Theme Toggle -->
-        <button style="color: var(--text-muted); font-size: 1.25rem; margin-right: 0.5rem;">
-          <i class="fa-regular fa-sun"></i>
-        </button>
-        <!-- User Avatar -->
-        <div style="position: relative;">
-          <button class="avatar-btn" onclick="document.getElementById('user-menu').classList.toggle('open')">
-            U
-          </button>
-          
-          <div id="user-menu" style="display:none; position: absolute; top: 100%; right: 0; margin-top: 0.5rem; width: 200px; background: white; border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--card-shadow); padding: 0.5rem 0;">
-            <div style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--card-border);">
-              <p style="font-size: 0.875rem; font-weight: 500;">Admin User</p>
-              <p style="font-size: 0.75rem; color: var(--text-muted);">admin@stockly.com</p>
+        <button class="btn btn-link btn-sm order-1 order-lg-0 text-white" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
+        
+        <!-- Navbar Search -->
+        <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+            <div class="input-group">
+                <input class="form-control" type="text" placeholder="Buscar..." aria-label="Search" aria-describedby="basic-addon2" />
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button>
+                </div>
             </div>
-            <a href="#" style="display: block; padding: 0.5rem 1rem; font-size: 0.875rem; color: var(--status-red);" onclick="logout()">
-              <i class="fa-solid fa-arrow-right-from-bracket" style="margin-right: 0.5rem;"></i> Logout
-            </a>
-          </div>
-        </div>
-      </div>
-    </header>
+        </form>
 
-    <!-- Main Content Wrapper -->
-    <main class="main-content">
-      
-      <!-- PageSectionHeader (Store Overview) -->
-      <div class="section-header">
-        <div class="section-icon-wrap">
-          <i class="fa-solid fa-chart-line"></i>
-        </div>
-        <div>
-          <h2 class="section-title">Store Overview</h2>
-          <p class="section-desc">The cards below show your store-wide metrics as the store owner. Numbers update automatically when you or others make changes.</p>
-        </div>
-      </div>
+        <!-- Navbar Profile -->
+        <ul class="navbar-nav ml-auto ml-md-0">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-white" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i> <span id="userNameDisplay">Usuario</span></a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                    <a class="dropdown-item" href="#">Configuración</a>
+                    <a class="dropdown-item" href="#">Registro de Actividad</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" id="logoutBtn">Cerrar Sesión</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
 
-      <!-- StatisticsSection -->
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-title">Ingresos Totales</span>
-            <i class="fa-solid fa-dollar-sign kpi-icon"></i>
-          </div>
-          <div class="kpi-value" id="kpi-ingresos">$45,231</div>
-          <p style="font-size: 0.75rem; color: var(--status-green);">+20.1% este mes</p>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-title">Productos en Stock</span>
-            <i class="fa-solid fa-box kpi-icon"></i>
-          </div>
-          <div class="kpi-value" id="kpi-stock">1,245</div>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">+15 agregados recientemente</p>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-title">Órdenes Pendientes</span>
-            <i class="fa-solid fa-cart-shopping kpi-icon"></i>
-          </div>
-          <div class="kpi-value" id="kpi-ordenes">23</div>
-          <p style="font-size: 0.75rem; color: var(--status-yellow);">Requieren atención</p>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-title">Proveedores Activos</span>
-            <i class="fa-solid fa-truck kpi-icon"></i>
-          </div>
-          <div class="kpi-value" id="kpi-proveedores">8</div>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">Actualizado hace 1 hr</p>
-        </div>
-      </div>
+    <div id="layoutSidenav">
+        <!-- Sidebar -->
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <marquee class="text-white mt-2 mb-2" style="font-size: 13px;">#&nbsp;Node.js&nbsp;&nbsp;#&nbsp;Express&nbsp;&nbsp;#&nbsp;Vanilla JS&nbsp;&nbsp;#&nbsp;Inventario POS</marquee>
+                        
+                        <a class="nav-link" href="index.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Dashboard
+                        </a>
 
-      <!-- Tablas (Products, Suppliers) - Copiando Lists.tsx -->
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-        
-        <!-- ProductList Replica -->
-        <div class="table-wrapper">
-          <div class="table-header">
-            <h3>Recent Products</h3>
-            <button class="btn btn-outline" onclick="window.location.href='pages/inventario.html'">View All</button>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>SKU</th>
-                <th>Stock</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody id="recent-products-body">
-              <!-- JS -->
-            </tbody>
-          </table>
+                        <a class="nav-link bg-primary text-white" href="pages/pos.html">
+                            <div class="sb-nav-link-icon text-white"><i class="fas fa-desktop"></i></div>
+                            <b>Punto de Venta (POS)</b>
+                        </a>
+
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProducts" aria-expanded="false" aria-controls="collapseProducts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
+                            Productos
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseProducts" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav" style="background-color: #1e293b;">
+                                <a class="nav-link" href="pages/categorias.html">Categorías</a>
+                                <a class="nav-link" href="pages/marcas.html">Marcas</a>
+                                <a class="nav-link" href="#">Ver Todos</a>
+                            </nav>
+                        </div>
+
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSuppliers" aria-expanded="false" aria-controls="collapseSuppliers">
+                            <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
+                            Proveedores
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseSuppliers" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav" style="background-color: #1e293b;">
+                                <a class="nav-link" href="pages/proveedores.html">Gestionar Proveedores</a>
+                            </nav>
+                        </div>
+
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePurchases" aria-expanded="false" aria-controls="collapsePurchases">
+                            <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
+                            Compras
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapsePurchases" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav" style="background-color: #1e293b;">
+                                <a class="nav-link" href="pages/compras.html">Historial de Compras</a>
+                            </nav>
+                        </div>
+
+                        <a class="nav-link" href="#">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                            Reportes Stock
+                        </a>
+                    </div>
+                </div>
+            </nav>
         </div>
 
-        <!-- SupplierList Replica -->
-        <div class="table-wrapper">
-          <div class="table-header">
-            <h3>Recent Suppliers</h3>
-            <button class="btn btn-outline" onclick="window.location.href='pages/proveedores.html'">View All</button>
-          </div>
-          <table style="font-size: 0.875rem;">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Contacto</th>
-              </tr>
-            </thead>
-            <tbody id="recent-suppliers-body">
-              <!-- JS -->
-            </tbody>
-          </table>
+        <!-- Main Content (Dashboard / Home.vue equivalent) -->
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid">
+                    
+                    <h1 class="mt-4">Dashboard Principal</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item active">Resumen General - InventarioPro</li>
+                    </ol>
+                    
+                    <!-- KPI Cards -->
+                    <div class="row">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card bg-primary text-white mb-4">
+                                <div class="card-body">
+                                    <h4 id="todaySales">Cargando...</h4>
+                                </div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <span class="text-white stretched-link">Ventas de Hoy</span>
+                                    <div class="text-white"><i class="fas fa-shopping-bag"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card bg-success text-white mb-4">
+                                <div class="card-body">
+                                    <h4 id="todayIncome">Cargando...</h4>
+                                </div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <span class="text-white stretched-link">Ingresos de Hoy</span>
+                                    <div class="text-white"><i class="fas fa-money-bill-wave"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card bg-info text-white mb-4">
+                                <div class="card-body">
+                                    <h4 id="totalProducts">Cargando...</h4>
+                                </div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <span class="text-white stretched-link">Total Productos</span>
+                                    <div class="text-white"><i class="fas fa-boxes"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card bg-danger text-white mb-4">
+                                <div class="card-body">
+                                    <h4 id="todayExpense">Cargando...</h4>
+                                </div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <span class="text-white stretched-link">Gastos del Día</span>
+                                    <div class="text-white"><i class="fas fa-file-invoice-dollar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Out Products Table -->
+                    <div class="row my-3">
+                        <div class="col-xl-12">
+                            <div class="card border-primary">
+                                <div class="card-header text-primary font-weight-bold">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    Productos con Stock Bajo o Agotado
+                                </div>
+                                <div class="card-body pt-3">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped table-hover" id="stockTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr class="bg-info text-white">
+                                                    <th>Código</th>
+                                                    <th>Nombre del Producto</th>
+                                                    <th>Categoría</th>
+                                                    <th>Estado</th>
+                                                    <th>Cantidad Disp.</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="stockTableBody">
+                                                <!-- Llenado vía JS -->
+                                                <tr><td colspan="5" class="text-center">Cargando datos...</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
         </div>
+    </div>
 
-      </div>
+    <!-- Scripts Bootstrap / jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Sidebar Toggle Logic -->
+    <script>
+        (function($) {
+            "use strict";
+            $("#sidebarToggle").on("click", function(e) {
+                e.preventDefault();
+                $("body").toggleClass("sb-sidenav-toggled");
+            });
+        })(jQuery);
+    </script>
 
-    </main>
-  </div>
+    <!-- App Logic -->
+    <script type="module">
+        import config from './js/config.js';
 
-  <script>
-    // Toggle dropdown (simple)
-    document.addEventListener('click', (e) => {
-      const menu = document.getElementById('user-menu');
-      if (e.target.closest('.avatar-btn')) {
-        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-      } else if (!e.target.closest('#user-menu')) {
-        menu.style.display = 'none';
-      }
-    });
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user'));
 
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = 'pages/register.html';
-    }
+            if (!token) {
+                window.location.href = 'pages/register.html';
+                return;
+            }
 
-    async function loadDashboardData() {
-      try {
-        const token = localStorage.getItem('token');
-        if(!token) {
-          console.log("No token, showing dummy data for preview");
-          renderDummyData();
-          return;
-        }
-        
-        const res = await fetch('http://localhost:3001/api/dashboard', {
-          headers: { 'Authorization': `Bearer ${token}` }
+            if (user) {
+                document.getElementById('userNameDisplay').textContent = user.nombre;
+            }
+
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'pages/register.html';
+            });
+
+            try {
+                // Fetch Dashboard Stats from Backend
+                const response = await fetch(`${config.API_URL}/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    document.getElementById('todaySales').textContent = (data.kpis.ventasTotales || 0).toLocaleString('es-DO', { style: 'currency', currency: 'DOP' });
+                    document.getElementById('todayIncome').textContent = (data.kpis.ingresos || 0).toLocaleString('es-DO', { style: 'currency', currency: 'DOP' });
+                    document.getElementById('totalProducts').textContent = (data.kpis.productosBajoStock || 0) + ' / ' + (data.kpis.totalProductos || 0);
+                    document.getElementById('todayExpense').textContent = 'RD$ 0.00';
+
+                    // Populate Stock table
+                    const tbody = document.getElementById('stockTableBody');
+                    if (data.listas && data.listas.bajoStock && data.listas.bajoStock.length > 0) {
+                        tbody.innerHTML = '';
+                        data.listas.bajoStock.forEach(p => {
+                            const isStockOut = p.stock_actual <= 0;
+                            const badge = isStockOut ? '<span class="badge badge-danger">Agotado</span>' : '<span class="badge badge-warning">Stock Bajo</span>';
+                            
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${p.codigo || p.sku || 'N/A'}</td>
+                                    <td>${p.producto}</td>
+                                    <td>${p.categoria?.nombre || 'General'}</td>
+                                    <td>${badge}</td>
+                                    <td><b>${p.stock_actual}</b></td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay productos con bajo stock.</td></tr>';
+                    }
+                }
+            } catch (error) {
+                console.error("Error al cargar dashboard:", error);
+            }
         });
-        const data = await res.json();
-        
-        if(data.success && data.data) {
-          const { kpis, recentProducts, recentSuppliers } = data.data;
-          
-          // KPIs
-          document.getElementById('kpi-ingresos').textContent = `$${(kpis.totalIngresos || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-          document.getElementById('kpi-stock').textContent = (kpis.productosEnStock || 0).toLocaleString();
-          document.getElementById('kpi-ordenes').textContent = (kpis.ordenesPendientes || 0).toLocaleString();
-          document.getElementById('kpi-proveedores').textContent = (kpis.proveedoresActivos || 0).toLocaleString();
-
-          // Recent Products
-          const pBody = document.getElementById('recent-products-body');
-          pBody.innerHTML = '';
-          if (recentProducts.length === 0) {
-            pBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No hay productos</td></tr>';
-          } else {
-            recentProducts.forEach(p => {
-              const badgeClass = p.status === 'In Stock' ? 'badge-green' : p.status === 'Low Stock' ? 'badge-yellow' : 'badge-red';
-              pBody.innerHTML += `
-                <tr>
-                  <td>
-                    <div style="display:flex; align-items:center; gap:0.5rem;">
-                      <div style="width:2rem;height:2rem;background:#f1f5f9;border-radius:0.25rem;display:flex;align-items:center;justify-content:center;color:var(--primary-color);">
-                        <i class="fa-solid fa-box"></i>
-                      </div>
-                      ${p.name}
-                    </div>
-                  </td>
-                  <td style="color:var(--text-muted);">${p.sku}</td>
-                  <td>${p.stock} <span style="color:var(--text-muted);font-size:0.75rem;">uds</span></td>
-                  <td><span class="badge ${badgeClass}">${p.status}</span></td>
-                </tr>
-              `;
-            });
-          }
-
-          // Recent Suppliers
-          const sBody = document.getElementById('recent-suppliers-body');
-          sBody.innerHTML = '';
-          if (recentSuppliers.length === 0) {
-            sBody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:var(--text-muted);">No hay proveedores</td></tr>';
-          } else {
-            recentSuppliers.forEach(s => {
-              sBody.innerHTML += `
-                <tr>
-                  <td style="font-weight:500;">
-                    <div style="display:flex; align-items:center; gap:0.5rem;">
-                      <div style="width:1.5rem;height:1.5rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">
-                        ${s.name.charAt(0).toUpperCase()}
-                      </div>
-                      ${s.name}
-                    </div>
-                  </td>
-                  <td style="color:var(--text-muted);">${s.contact?.email || s.contact?.phone || '-'}</td>
-                </tr>
-              `;
-            });
-          }
-        } else {
-          throw new Error('No data');
-        }
-      } catch(e) {
-        console.log("Error loading dashboard data (backend down). Showing dummy data.", e);
-        renderDummyData();
-      }
-    }
-
-    function renderDummyData() {
-      // Products
-      const pBody = document.getElementById('recent-products-body');
-      pBody.innerHTML = `
-        <tr>
-          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:2rem;height:2rem;background:#f1f5f9;border-radius:0.25rem;display:flex;align-items:center;justify-content:center;color:var(--primary-color);"><i class="fa-solid fa-laptop"></i></div>Laptop XPS 15</div></td>
-          <td style="color:var(--text-muted);">SKU-001</td>
-          <td>45 <span style="color:var(--text-muted);font-size:0.75rem;">uds</span></td>
-          <td><span class="badge badge-green">In Stock</span></td>
-        </tr>
-        <tr>
-          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:2rem;height:2rem;background:#f1f5f9;border-radius:0.25rem;display:flex;align-items:center;justify-content:center;color:var(--primary-color);"><i class="fa-solid fa-desktop"></i></div>Monitor UltraWide</div></td>
-          <td style="color:var(--text-muted);">SKU-002</td>
-          <td>12 <span style="color:var(--text-muted);font-size:0.75rem;">uds</span></td>
-          <td><span class="badge badge-yellow">Low Stock</span></td>
-        </tr>
-        <tr>
-          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:2rem;height:2rem;background:#f1f5f9;border-radius:0.25rem;display:flex;align-items:center;justify-content:center;color:var(--primary-color);"><i class="fa-solid fa-keyboard"></i></div>Teclado Mecánico</div></td>
-          <td style="color:var(--text-muted);">SKU-003</td>
-          <td>89 <span style="color:var(--text-muted);font-size:0.75rem;">uds</span></td>
-          <td><span class="badge badge-green">In Stock</span></td>
-        </tr>
-      `;
-
-      // Suppliers
-      const sBody = document.getElementById('recent-suppliers-body');
-      sBody.innerHTML = `
-        <tr>
-          <td style="font-weight:500;"><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:1.5rem;height:1.5rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">T</div>Tech Distribuidores</div></td>
-          <td style="color:var(--text-muted);">contacto@tech.com</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500;"><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:1.5rem;height:1.5rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">G</div>Global Imports</div></td>
-          <td style="color:var(--text-muted);">ventas@global.com</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500;"><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:1.5rem;height:1.5rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">O</div>Office Supplies SA</div></td>
-          <td style="color:var(--text-muted);">info@office.com</td>
-        </tr>
-      `;
-    }
-
-    loadDashboardData();
-  </script>
+    </script>
 </body>
 </html>
