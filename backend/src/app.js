@@ -21,6 +21,7 @@ const entityRoutes    = require('./routes/entities');
 const categoryRoutes  = require('./routes/categories');
 const brandRoutes     = require('./routes/brands');
 const unitRoutes      = require('./routes/units');
+const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use('/api/entities',  entityRoutes);
 app.use('/api/categories',categoryRoutes);
 app.use('/api/brands',    brandRoutes);
 app.use('/api/units',     unitRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/imports',   require('./routes/imports'));
 app.use('/api/transfers', require('./routes/transfers'));
 

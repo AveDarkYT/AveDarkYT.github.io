@@ -3,381 +3,299 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sistema de Control de Inventario de Almacén - Dashboard Principal">
-  <title>InventarioPro | Dashboard</title>
+  <title>Stockly | Dashboard</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <style>
-    .chart-container { position: relative; height: 240px; }
-    .scanner-input-wrap {
-      display: flex; gap: 10px; align-items: center;
-      background: rgba(59,130,246,0.08);
-      border: 1px solid rgba(59,130,246,0.3);
-      border-radius: 12px; padding: 12px 16px;
-      margin-bottom: 20px;
-    }
-    .scanner-input-wrap input {
-      flex: 1; background: none; border: none; outline: none;
-      color: var(--text-primary); font-size: 16px; font-family: monospace;
-    }
-    .scanner-input-wrap .scan-icon { color: var(--accent-blue); font-size: 22px; }
-    .activity-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-    .activity-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .activity-icon.entrada { background: rgba(16,185,129,0.15); color: var(--accent-green); }
-    .activity-icon.salida  { background: rgba(239,68,68,0.15);  color: var(--accent-red); }
-    .activity-icon.ajuste  { background: rgba(245,158,11,0.15); color: var(--accent-yellow); }
-  </style>
 </head>
 <body>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toast-container" role="alert" aria-live="polite"></div>
-
-<div class="app-layout">
-
-  <!-- ══ SIDEBAR ═══════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menú principal">
-
-    <div class="sidebar-logo">
-      <div class="logo-icon">📦</div>
-      <div>
-        <h1>InventarioPro</h1>
-        <span>Sistema de Almacén v1.0</span>
+  <!-- App Shell Wrapper -->
+  <div class="app-shell">
+    
+    <!-- Top Navbar Exact Replica -->
+    <header class="navbar">
+      <div class="nav-left">
+        <a href="index.html" class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-box-open"></i>
+          </div>
+          <span>Stockly</span>
+        </a>
+        <nav class="nav-links">
+          <a href="index.html" class="nav-item active">Dashboard</a>
+          <a href="pages/inventario.html" class="nav-item">Inventario</a>
+          <a href="pages/compras.html" class="nav-item">Compras</a>
+          <a href="pages/pos.html" class="nav-item">Punto de Venta</a>
+          <a href="pages/proveedores.html" class="nav-item">Proveedores</a>
+        </nav>
       </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <!-- PRINCIPAL -->
-      <p class="nav-section-title">PRINCIPAL</p>
-      <a href="index.html" class="nav-item active" id="nav-dashboard">
-        <span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio
-      </a>
-      <a href="pages/pos.html" class="nav-item" id="nav-pos">
-        <span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta
-      </a>
-
-      <!-- INVENTARIO -->
-      <p class="nav-section-title">INVENTARIO</p>
-      <a href="pages/productos.html" class="nav-item" id="nav-productos">
-        <span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos
-      </a>
-      <a href="pages/categorias.html" class="nav-item" id="nav-categorias">
-        <span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías
-      </a>
-      <a href="pages/unidades.html" class="nav-item" id="nav-unidades">
-        <span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades
-      </a>
-      <a href="pages/marcas.html" class="nav-item" id="nav-marcas">
-        <span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas
-      </a>
-      <a href="pages/inventario.html" class="nav-item" id="nav-inventario">
-        <span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario
-      </a>
-      <a href="pages/stock-bajo.html" class="nav-item" id="nav-stock-bajo">
-        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo
-      </a>
-      <a href="pages/lotes.html" class="nav-item" id="nav-lotes">
-        <span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes
-      </a>
-      <a href="pages/etiquetas.html" class="nav-item" id="nav-etiquetas">
-        <span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas
-      </a>
-
-      <!-- VENTAS -->
-      <p class="nav-section-title">VENTAS</p>
-      <a href="pages/ventas-historial.html" class="nav-item" id="nav-ventas-historial">
-        <span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas
-      </a>
-
-      <!-- COMPRAS -->
-      <p class="nav-section-title">COMPRAS</p>
-      <a href="pages/compras.html" class="nav-item" id="nav-compras">
-        <span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras
-      </a>
-      <a href="pages/proveedores.html" class="nav-item" id="nav-proveedores">
-        <span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores
-      </a>
-      <a href="pages/pagos.html" class="nav-item" id="nav-pagos">
-        <span class="nav-icon"><i class="fa fa-money-bill-wave"></i></span> Pagos
-      </a>
-
-      <!-- OTROS -->
-      <p class="nav-section-title">OTROS</p>
-      <a href="pages/reportes.html" class="nav-item" id="nav-reportes">
-        <span class="nav-icon"><i class="fa fa-chart-line"></i></span> Reportes
-      </a>
-      <a href="pages/configuracion.html" class="nav-item" id="nav-configuracion">
-        <span class="nav-icon"><i class="fa fa-cog"></i></span> Configuración
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="user-card">
-        <div class="user-avatar" id="user-avatar">A</div>
-        <div class="user-info">
-          <strong id="user-name">Cargando...</strong>
-          <small id="user-rol">-</small>
-        </div>
-      </div>
-      <button class="btn btn-ghost w-full mt-4" id="btn-logout" style="justify-content:center; gap:8px">
-        <i class="fa fa-sign-out-alt"></i> Cerrar Sesión
-      </button>
-    </div>
-  </aside>
-
-  <!-- ══ CONTENIDO PRINCIPAL ═══════════════════════════ -->
-  <main class="main-content">
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="topbar-title">
-        <h2>Dashboard</h2>
-        <p id="current-date">Cargando fecha...</p>
-      </div>
-      <div class="topbar-actions">
-        <div class="search-bar" role="search">
-          <i class="fa fa-search" style="color:var(--text-muted)"></i>
-          <input type="text" id="global-search" placeholder="Buscar producto, SKU..." aria-label="Buscar">
-        </div>
-        <div class="connection-status" id="conn-status" title="Estado de conexión">
-          <div class="status-dot" id="status-dot"></div>
-          <span id="status-text">Conectado</span>
-        </div>
-        <button class="btn-icon" title="Actualizar dashboard" id="btn-refresh">
-          <i class="fa fa-sync-alt"></i>
+      
+      <div class="nav-right">
+        <!-- Bell Icon -->
+        <button style="color: var(--text-muted); font-size: 1.25rem;">
+          <i class="fa-regular fa-bell"></i>
         </button>
+        <!-- Theme Toggle -->
+        <button style="color: var(--text-muted); font-size: 1.25rem; margin-right: 0.5rem;">
+          <i class="fa-regular fa-sun"></i>
+        </button>
+        <!-- User Avatar -->
+        <div style="position: relative;">
+          <button class="avatar-btn" onclick="document.getElementById('user-menu').classList.toggle('open')">
+            U
+          </button>
+          
+          <div id="user-menu" style="display:none; position: absolute; top: 100%; right: 0; margin-top: 0.5rem; width: 200px; background: white; border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--card-shadow); padding: 0.5rem 0;">
+            <div style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--card-border);">
+              <p style="font-size: 0.875rem; font-weight: 500;">Admin User</p>
+              <p style="font-size: 0.75rem; color: var(--text-muted);">admin@stockly.com</p>
+            </div>
+            <a href="#" style="display: block; padding: 0.5rem 1rem; font-size: 0.875rem; color: var(--status-red);" onclick="logout()">
+              <i class="fa-solid fa-arrow-right-from-bracket" style="margin-right: 0.5rem;"></i> Logout
+            </a>
+          </div>
+        </div>
       </div>
     </header>
 
-    <!-- Contenido -->
-    <div class="page-content">
-
-      <!-- ── Barra de Escáner Rápido ─────────────────── -->
-      <div class="scanner-input-wrap">
-        <i class="fa fa-barcode scan-icon"></i>
-        <input
-          type="text"
-          id="quick-scan-input"
-          placeholder="Escanea un código de barras aquí... (Enter para registrar salida)"
-          aria-label="Escaneo rápido de código de barras"
-          autocomplete="off"
-          spellcheck="false"
-        >
-        <select id="quick-scan-tipo" class="form-control" style="width:auto; padding:6px 10px">
-          <option value="salida">📤 Salida</option>
-          <option value="entrada">📥 Entrada</option>
-        </select>
-        <span id="scan-feedback" style="font-size:13px; color:var(--text-muted); min-width:80px;"></span>
+    <!-- Main Content Wrapper -->
+    <main class="main-content">
+      
+      <!-- PageSectionHeader (Store Overview) -->
+      <div class="section-header">
+        <div class="section-icon-wrap">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div>
+          <h2 class="section-title">Store Overview</h2>
+          <p class="section-desc">The cards below show your store-wide metrics as the store owner. Numbers update automatically when you or others make changes.</p>
+        </div>
       </div>
 
-      <!-- ── KPI Cards ───────────────────────────────── -->
-      <div class="kpi-grid" id="kpi-grid">
-        <div class="kpi-card blue">
+      <!-- StatisticsSection -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
           <div class="kpi-header">
-            <div class="kpi-label">Total Productos</div>
-            <div class="kpi-icon" aria-hidden="true">📦</div>
+            <span class="kpi-title">Ingresos Totales</span>
+            <i class="fa-solid fa-dollar-sign kpi-icon"></i>
           </div>
-          <div class="kpi-value" id="kpi-total-productos">–</div>
-          <div class="kpi-footer">
-            <span class="kpi-badge up" id="kpi-productos-activos">0 activos</span>
-          </div>
+          <div class="kpi-value" id="kpi-ingresos">$45,231</div>
+          <p style="font-size: 0.75rem; color: var(--status-green);">+20.1% este mes</p>
         </div>
-
-        <div class="kpi-card green">
+        <div class="kpi-card">
           <div class="kpi-header">
-            <div class="kpi-label">Unidades en Stock</div>
-            <div class="kpi-icon" aria-hidden="true">🏭</div>
+            <span class="kpi-title">Productos en Stock</span>
+            <i class="fa-solid fa-box kpi-icon"></i>
           </div>
-          <div class="kpi-value" id="kpi-total-unidades">–</div>
-          <div class="kpi-footer">
-            <span class="kpi-badge up">Total disponible</span>
-          </div>
+          <div class="kpi-value" id="kpi-stock">1,245</div>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">+15 agregados recientemente</p>
         </div>
-
-        <div class="kpi-card yellow">
+        <div class="kpi-card">
           <div class="kpi-header">
-            <div class="kpi-label">Stock Bajo Reorden</div>
-            <div class="kpi-icon" aria-hidden="true">⚠️</div>
+            <span class="kpi-title">Órdenes Pendientes</span>
+            <i class="fa-solid fa-cart-shopping kpi-icon"></i>
           </div>
-          <div class="kpi-value" id="kpi-bajo-reorden" style="color:var(--accent-yellow)">–</div>
-          <div class="kpi-footer">
-            <span class="kpi-badge warn" id="kpi-criticos">0 críticos</span>
-          </div>
+          <div class="kpi-value" id="kpi-ordenes">23</div>
+          <p style="font-size: 0.75rem; color: var(--status-yellow);">Requieren atención</p>
         </div>
-
-        <div class="kpi-card red">
+        <div class="kpi-card">
           <div class="kpi-header">
-            <div class="kpi-label">Sin Stock</div>
-            <div class="kpi-icon" aria-hidden="true">⛔</div>
+            <span class="kpi-title">Proveedores Activos</span>
+            <i class="fa-solid fa-truck kpi-icon"></i>
           </div>
-          <div class="kpi-value" id="kpi-sin-stock" style="color:var(--accent-red)">–</div>
-          <div class="kpi-footer">
-            <span class="kpi-badge down">Requieren reabastecimiento</span>
-          </div>
-        </div>
-
-        <div class="kpi-card purple">
-          <div class="kpi-header">
-            <div class="kpi-label">Movimientos Hoy</div>
-            <div class="kpi-icon" aria-hidden="true">🔄</div>
-          </div>
-          <div class="kpi-value" id="kpi-movimientos-hoy">–</div>
-          <div class="kpi-footer">
-            <span id="kpi-salidas-hoy" style="font-size:12px; color:var(--text-muted)">0 salidas / 0 entradas</span>
-          </div>
+          <div class="kpi-value" id="kpi-proveedores">8</div>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">Actualizado hace 1 hr</p>
         </div>
       </div>
 
-      <!-- ── Grid de contenido principal ────────────── -->
-      <div class="content-grid">
-
-        <!-- Panel izquierdo: Tabla de stock crítico + Gráfico -->
-        <div class="flex flex-col gap-4">
-
-          <!-- Tabla: Productos con stock crítico -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">
-                <i class="fa fa-exclamation-triangle" style="color:var(--accent-yellow)"></i>
-                Productos que Requieren Atención
-              </div>
-              <a href="pages/productos.html" class="btn btn-ghost btn-sm">Ver todos</a>
-            </div>
-            <div class="card-body" style="padding: 0 0 8px 0">
-              <table class="data-table" id="low-stock-table" aria-label="Productos con stock bajo">
-                <thead>
-                  <tr>
-                    <th>Producto / SKU</th>
-                    <th>Ubicación</th>
-                    <th>Stock</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody id="low-stock-tbody">
-                  <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:24px">
-                    <span class="spinner"></span>
-                  </td></tr>
-                </tbody>
-              </table>
-            </div>
+      <!-- Tablas (Products, Suppliers) - Copiando Lists.tsx -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        
+        <!-- ProductList Replica -->
+        <div class="table-wrapper">
+          <div class="table-header">
+            <h3>Recent Products</h3>
+            <button class="btn btn-outline" onclick="window.location.href='pages/inventario.html'">View All</button>
           </div>
-
-          <!-- Gráfico de movimientos -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">
-                <i class="fa fa-chart-bar" style="color:var(--accent-blue)"></i>
-                Movimientos de los Últimos 7 Días
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas id="movements-chart" aria-label="Gráfico de movimientos"></canvas>
-              </div>
-            </div>
-          </div>
-
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>SKU</th>
+                <th>Stock</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="recent-products-body">
+              <!-- JS -->
+            </tbody>
+          </table>
         </div>
 
-        <!-- Panel derecho: Alertas activas + Actividad reciente -->
-        <div class="flex flex-col gap-4">
-
-          <!-- Alertas activas -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">
-                <i class="fa fa-bell" style="color:var(--accent-red)"></i>
-                Alertas Activas
-              </div>
-              <a href="pages/alertas.html" class="btn btn-ghost btn-sm">Ver todas</a>
-            </div>
-            <div class="card-body">
-              <div class="alert-list" id="alerts-list">
-                <div style="text-align:center; padding:20px">
-                  <span class="spinner"></span>
-                </div>
-              </div>
-            </div>
+        <!-- SupplierList Replica -->
+        <div class="table-wrapper">
+          <div class="table-header">
+            <h3>Recent Suppliers</h3>
+            <button class="btn btn-outline" onclick="window.location.href='pages/proveedores.html'">View All</button>
           </div>
-
-          <!-- Actividad reciente -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">
-                <i class="fa fa-history" style="color:var(--accent-cyan)"></i>
-                Actividad Reciente
-              </div>
-            </div>
-            <div class="card-body">
-              <div id="activity-list">
-                <div style="text-align:center; padding:20px">
-                  <span class="spinner"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
+          <table style="font-size: 0.875rem;">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Contacto</th>
+              </tr>
+            </thead>
+            <tbody id="recent-suppliers-body">
+              <!-- JS -->
+            </tbody>
+          </table>
         </div>
+
       </div>
 
-    </div><!-- /page-content -->
-  </main>
-</div>
-
-<!-- ══ LOGIN MODAL ════════════════════════════════════════ -->
-<div id="login-overlay" style="
-  display:none; position:fixed; inset:0; z-index:9998;
-  background:rgba(0,0,0,0.85); backdrop-filter:blur(10px);
-  display:flex; align-items:center; justify-content:center;
-" role="dialog" aria-modal="true" aria-label="Iniciar sesión">
-  <div style="
-    background:var(--bg-secondary); border:var(--glass-border);
-    border-radius:var(--radius-xl); padding:40px; width:380px;
-    box-shadow:var(--shadow-md); animation: fadeIn .3s ease;
-  ">
-    <div style="text-align:center; margin-bottom:28px">
-      <div style="font-size:44px; margin-bottom:12px">📦</div>
-      <h2 style="font-size:22px; font-weight:800">InventarioPro</h2>
-      <p style="color:var(--text-muted); font-size:14px; margin-top:6px">Sistema de Control de Almacén</p>
-    </div>
-    <form id="login-form" novalidate>
-      <div class="form-group mb-4">
-        <label class="form-label" for="login-email">Email</label>
-        <input type="email" id="login-email" class="form-control"
-          placeholder="correo@ejemplo.com" autocomplete="email" required>
-      </div>
-      <div class="form-group mb-4">
-        <label class="form-label" for="login-password">Contraseña</label>
-        <input type="password" id="login-password" class="form-control"
-          placeholder="••••••••" autocomplete="current-password" required>
-      </div>
-      <button type="submit" class="btn btn-primary w-full" id="login-btn" style="justify-content:center">
-        <i class="fa fa-sign-in-alt"></i> Iniciar Sesión
-      </button>
-
-      <div style="text-align: center; margin-top: 15px;">
-        <a href="register.html" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">¿No tienes cuenta? Regístrate aquí</a>
-      </div>
-    </form>
-    <div id="login-error" style="
-      display:none; margin-top:14px; padding:10px 14px;
-      background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
-      border-radius:8px; color:var(--accent-red); font-size:13px;
-    "></div>
+    </main>
   </div>
-</div>
 
-<script src="js/api.js"></script>
-<script src="js/socket.js"></script>
-<script src="js/charts.js"></script>
-<script src="js/app.js"></script>
+  <script>
+    // Toggle dropdown (simple)
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('user-menu');
+      if (e.target.closest('.avatar-btn')) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+      } else if (!e.target.closest('#user-menu')) {
+        menu.style.display = 'none';
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'pages/register.html';
+    }
+
+    async function loadDashboardData() {
+      try {
+        const token = localStorage.getItem('token');
+        if(!token) {
+          console.log("No token, showing dummy data for preview");
+          renderDummyData();
+          return;
+        }
+        
+        const res = await fetch('http://localhost:3001/api/dashboard', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if(data.success && data.data) {
+          const { kpis, recentProducts, recentSuppliers } = data.data;
+          
+          // KPIs
+          document.getElementById('kpi-ingresos').textContent = `$${(kpis.totalIngresos || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+          document.getElementById('kpi-stock').textContent = (kpis.productosEnStock || 0).toLocaleString();
+          document.getElementById('kpi-ordenes').textContent = (kpis.ordenesPendientes || 0).toLocaleString();
+          document.getElementById('kpi-proveedores').textContent = (kpis.proveedoresActivos || 0).toLocaleString();
+
+          // Recent Products
+          const pBody = document.getElementById('recent-products-body');
+          pBody.innerHTML = '';
+          if (recentProducts.length === 0) {
+            pBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No hay productos</td></tr>';
+          } else {
+            recentProducts.forEach(p => {
+              const badgeClass = p.status === 'In Stock' ? 'badge-green' : p.status === 'Low Stock' ? 'badge-yellow' : 'badge-red';
+              pBody.innerHTML += `
+                <tr>
+                  <td>
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                      <div style="width:2rem;height:2rem;background:#f1f5f9;border-radius:0.25rem;display:flex;align-items:center;justify-content:center;color:var(--primary-color);">
+                        <i class="fa-solid fa-box"></i>
+                      </div>
+                      ${p.name}
+                    </div>
+                  </td>
+                  <td style="color:var(--text-muted);">${p.sku}</td>
+                  <td>${p.stock} <span style="color:var(--text-muted);font-size:0.75rem;">uds</span></td>
+                  <td><span class="badge ${badgeClass}">${p.status}</span></td>
+                </tr>
+              `;
+            });
+          }
+
+          // Recent Suppliers
+          const sBody = document.getElementById('recent-suppliers-body');
+          sBody.innerHTML = '';
+          if (recentSuppliers.length === 0) {
+            sBody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:var(--text-muted);">No hay proveedores</td></tr>';
+          } else {
+            recentSuppliers.forEach(s => {
+              sBody.innerHTML += `
+                <tr>
+                  <td style="font-weight:500;">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                      <div style="width:1.5rem;height:1.5rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">
+                        ${s.name.charAt(0).toUpperCase()}
+                      </div>
+                      ${s.name}
+                    </div>
+                  </td>
+                  <td style="color:var(--text-muted);">${s.contact?.email || s.contact?.phone || '-'}</td>
+                </tr>
+              `;
+            });
+          }
+        } else {
+          throw new Error('No data');
+        }
+      } catch(e) {
+        console.log("Error loading dashboard data (backend down). Showing dummy data.", e);
+        renderDummyData();
+      }
+    }
+
+    function renderDummyData() {
+      // Products
+      const pBody = document.getElementById('recent-products-body');
+      pBody.innerHTML = `
+        <tr>
+          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:2rem;height:2rem;background:#f1f5f9;border-radius:0.25rem;display:flex;align-items:center;justify-content:center;color:var(--primary-color);"><i class="fa-solid fa-laptop"></i></div>Laptop XPS 15</div></td>
+          <td style="color:var(--text-muted);">SKU-001</td>
+          <td>45 <span style="color:var(--text-muted);font-size:0.75rem;">uds</span></td>
+          <td><span class="badge badge-green">In Stock</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:2rem;height:2rem;background:#f1f5f9;border-radius:0.25rem;display:flex;align-items:center;justify-content:center;color:var(--primary-color);"><i class="fa-solid fa-desktop"></i></div>Monitor UltraWide</div></td>
+          <td style="color:var(--text-muted);">SKU-002</td>
+          <td>12 <span style="color:var(--text-muted);font-size:0.75rem;">uds</span></td>
+          <td><span class="badge badge-yellow">Low Stock</span></td>
+        </tr>
+        <tr>
+          <td><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:2rem;height:2rem;background:#f1f5f9;border-radius:0.25rem;display:flex;align-items:center;justify-content:center;color:var(--primary-color);"><i class="fa-solid fa-keyboard"></i></div>Teclado Mecánico</div></td>
+          <td style="color:var(--text-muted);">SKU-003</td>
+          <td>89 <span style="color:var(--text-muted);font-size:0.75rem;">uds</span></td>
+          <td><span class="badge badge-green">In Stock</span></td>
+        </tr>
+      `;
+
+      // Suppliers
+      const sBody = document.getElementById('recent-suppliers-body');
+      sBody.innerHTML = `
+        <tr>
+          <td style="font-weight:500;"><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:1.5rem;height:1.5rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">T</div>Tech Distribuidores</div></td>
+          <td style="color:var(--text-muted);">contacto@tech.com</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;"><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:1.5rem;height:1.5rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">G</div>Global Imports</div></td>
+          <td style="color:var(--text-muted);">ventas@global.com</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;"><div style="display:flex; align-items:center; gap:0.5rem;"><div style="width:1.5rem;height:1.5rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">O</div>Office Supplies SA</div></td>
+          <td style="color:var(--text-muted);">info@office.com</td>
+        </tr>
+      `;
+    }
+
+    loadDashboardData();
+  </script>
 </body>
 </html>

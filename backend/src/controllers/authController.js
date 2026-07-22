@@ -16,16 +16,27 @@ const signToken = (id) => {
 exports.register = async (req, res, next) => {
   try {
     const { nombre, email, password, rol } = req.body;
-    const usuario = await User.create({ nombre, email, password, rol });
+    
+    // Generar un username único
+    const baseUsername = email.split('@')[0];
+    let username = baseUsername;
+    let counter = 1;
+    
+    while (await User.findOne({ username })) {
+      username = `${baseUsername}${counter}`;
+      counter++;
+    }
+
+    const usuario = await User.create({ nombre, email, password, rol, username });
     const token   = signToken(usuario._id);
     return res.status(201).json({
       success: true,
       message: 'Usuario registrado exitosamente',
-      data: { token, usuario: { id: usuario._id, nombre, email, rol: usuario.rol } }
+      data: { token, usuario: { id: usuario._id, nombre, email, username, rol: usuario.rol } }
     });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ success: false, message: 'El email ya está registrado' });
+      return res.status(409).json({ success: false, error: 'A user with this email already exists. Please sign in instead.' });
     }
     next(error);
   }

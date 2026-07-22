@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/inventario_almacen';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/onemax_v2';
 
 const options = {
   serverSelectionTimeoutMS: 5000,

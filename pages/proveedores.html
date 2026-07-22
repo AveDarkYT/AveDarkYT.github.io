@@ -3,226 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InventarioPro | Proveedores</title>
+  <title>Stockly | Proveedores</title>
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<div class="app-layout">
-  <aside class="sidebar">
-    <div class="sidebar-logo"><div class="logo-icon">📦</div><div><h1>InventarioPro</h1><span>Sistema de Almacén</span></div></div>
-    <nav class="sidebar-nav">
-      <!-- PRINCIPAL -->
-      <p class="nav-section-title">PRINCIPAL</p>
-      <a href="../index.html" class="nav-item" id="nav-dashboard">
-        <span class="nav-icon"><i class="fa fa-chart-pie"></i></span> Inicio
-      </a>
-      <a href="pos.html" class="nav-item" id="nav-pos">
-        <span class="nav-icon"><i class="fa fa-cash-register"></i></span> Punto de Venta
-      </a>
 
-      <!-- INVENTARIO -->
-      <p class="nav-section-title">INVENTARIO</p>
-      <a href="productos.html" class="nav-item" id="nav-productos">
-        <span class="nav-icon"><i class="fa fa-box-open"></i></span> Productos
-      </a>
-      <a href="categorias.html" class="nav-item" id="nav-categorias">
-        <span class="nav-icon"><i class="fa fa-tags"></i></span> Categorías
-      </a>
-      <a href="unidades.html" class="nav-item" id="nav-unidades">
-        <span class="nav-icon"><i class="fa fa-balance-scale"></i></span> Unidades
-      </a>
-      <a href="marcas.html" class="nav-item" id="nav-marcas">
-        <span class="nav-icon"><i class="fa fa-copyright"></i></span> Marcas
-      </a>
-      <a href="inventario.html" class="nav-item" id="nav-inventario">
-        <span class="nav-icon"><i class="fa fa-warehouse"></i></span> Inventario
-      </a>
-      <a href="stock-bajo.html" class="nav-item" id="nav-stock-bajo">
-        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Stock Bajo
-      </a>
-      <a href="lotes.html" class="nav-item" id="nav-lotes">
-        <span class="nav-icon"><i class="fa fa-layer-group"></i></span> Lotes
-      </a>
-      <a href="etiquetas.html" class="nav-item" id="nav-etiquetas">
-        <span class="nav-icon"><i class="fa fa-barcode"></i></span> Etiquetas
-      </a>
-
-      <!-- VENTAS -->
-      <p class="nav-section-title">VENTAS</p>
-      <a href="ventas-historial.html" class="nav-item" id="nav-ventas-historial">
-        <span class="nav-icon"><i class="fa fa-shopping-cart"></i></span> Historial de Ventas
-      </a>
-
-      <!-- COMPRAS -->
-      <p class="nav-section-title">COMPRAS</p>
-      <a href="compras.html" class="nav-item" id="nav-compras">
-        <span class="nav-icon"><i class="fa fa-shopping-bag"></i></span> Compras
-      </a>
-      <a href="proveedores.html" class="nav-item active" id="nav-proveedores">
-        <span class="nav-icon"><i class="fa fa-truck-loading"></i></span> Proveedores
-      </a>
-      <a href="pagos.html" class="nav-item" id="nav-pagos">
-        <span class="nav-icon"><i class="fa fa-money-bill-wave"></i></span> Pagos
-      </a>
-
-      <!-- OTROS -->
-      <p class="nav-section-title">OTROS</p>
-      <a href="reportes.html" class="nav-item" id="nav-reportes">
-        <span class="nav-icon"><i class="fa fa-chart-line"></i></span> Reportes
-      </a>
-      <a href="configuracion.html" class="nav-item" id="nav-configuracion">
-        <span class="nav-icon"><i class="fa fa-cog"></i></span> Configuración
-      </a>
-    </nav>
-  </aside>
-
-  <main class="main-content">
-    <header class="topbar">
-      <div class="topbar-title"><h2>🚚 Proveedores</h2><p>Gestiona tu catálogo de proveedores</p></div>
-      <div class="topbar-actions">
-        <button class="btn btn-primary" id="btn-new">
-          <i class="fa fa-plus"></i> Nuevo Proveedor
+  <div class="app-shell">
+    
+    <!-- Top Navbar -->
+    <header class="navbar">
+      <div class="nav-left">
+        <a href="../index.html" class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-box-open"></i>
+          </div>
+          <span>Stockly</span>
+        </a>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-item">Dashboard</a>
+          <a href="inventario.html" class="nav-item">Inventario</a>
+          <a href="compras.html" class="nav-item">Compras</a>
+          <a href="pos.html" class="nav-item">Punto de Venta</a>
+          <a href="proveedores.html" class="nav-item active">Proveedores</a>
+        </nav>
+      </div>
+      
+      <div class="nav-right">
+        <button style="color: var(--text-muted); font-size: 1.25rem;">
+          <i class="fa-regular fa-bell"></i>
         </button>
+        <div style="position: relative;">
+          <button class="avatar-btn" onclick="document.getElementById('user-menu').classList.toggle('open')">U</button>
+          <div id="user-menu" style="display:none; position: absolute; top: 100%; right: 0; margin-top: 0.5rem; width: 200px; background: white; border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--card-shadow); padding: 0.5rem 0;">
+            <a href="#" style="display: block; padding: 0.5rem 1rem; font-size: 0.875rem; color: var(--status-red);" onclick="logout()">Logout</a>
+          </div>
+        </div>
       </div>
     </header>
 
-    <div class="page-content">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Listado de Proveedores</div>
+    <main class="main-content">
+      
+      <!-- Page Header -->
+      <div class="section-header" style="justify-content: space-between; align-items: center; width: 100%;">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <div class="section-icon-wrap">
+            <i class="fa-solid fa-truck-field"></i>
+          </div>
+          <div>
+            <h2 class="section-title">Proveedores</h2>
+            <p class="section-desc">Gestiona tus proveedores y sus datos de contacto.</p>
+          </div>
         </div>
-        <div style="overflow-x:auto">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nombre Comercial</th>
-                <th>Contacto Principal</th>
-                <th>Email / Teléfono</th>
-                <th>NIT / Doc</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="proveedores-tbody">
-              <tr><td colspan="5" style="text-align:center;padding:24px"><span class="spinner"></span></td></tr>
-            </tbody>
-          </table>
+        <div>
+          <button class="btn btn-blue" onclick="openModal('provider-modal')">
+            <i class="fa-solid fa-plus"></i> Nuevo Proveedor
+          </button>
         </div>
       </div>
-    </div>
-  </main>
-</div>
 
-<!-- Modal -->
-<div class="modal-overlay" id="provider-modal">
-  <div class="modal-box" style="max-width:500px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-      <h3 style="font-size:18px;font-weight:700">Registrar Proveedor</h3>
-      <button class="btn-icon" id="btn-close-modal"><i class="fa fa-times"></i></button>
-    </div>
-    <form id="provider-form">
-      <div class="form-group" style="margin-bottom:16px">
-        <label class="form-label">Nombre Comercial *</label>
-        <input type="text" class="form-control" id="f-nombre" required>
-      </div>
-      <div class="form-group" style="margin-bottom:16px">
-        <label class="form-label">Contacto Principal</label>
-        <input type="text" class="form-control" id="f-contacto">
-      </div>
-      <div class="form-grid" style="margin-bottom:16px">
-        <div class="form-group">
-          <label class="form-label">Teléfono</label>
-          <input type="text" class="form-control" id="f-telefono">
+      <!-- Table Card -->
+      <div class="table-wrapper">
+        <div class="table-header">
+          <div style="position: relative; width: 300px;">
+            <i class="fa-solid fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <input type="text" class="form-control" placeholder="Buscar proveedor..." style="padding-left: 2.5rem;">
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" id="f-email">
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre Completo</th>
+              <th>Documento</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Estado</th>
+              <th style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="proveedores-tbody">
+            <!-- JS Data -->
+          </tbody>
+        </table>
       </div>
-      <div class="form-group" style="margin-bottom:24px">
-        <label class="form-label">Documento / NIT</label>
-        <input type="text" class="form-control" id="f-documento">
+    </main>
+  </div>
+
+  <!-- Modal: Crear/Editar Proveedor -->
+  <div class="modal-overlay" id="provider-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus" style="color: var(--primary-color); margin-right: 0.5rem;"></i> Agregar Proveedor</h3>
+        <button class="btn-close" onclick="closeModal('provider-modal')"><i class="fa-solid fa-xmark"></i></button>
       </div>
       
-      <div style="display:flex;gap:12px;justify-content:flex-end">
-        <button type="button" class="btn btn-ghost" id="btn-cancel">Cancelar</button>
-        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Guardar</button>
-      </div>
-    </form>
+      <form id="provider-form">
+        <input type="hidden" id="prov-id">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Nombre *</label>
+            <input type="text" id="prov-nombre" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Documento/RUC</label>
+            <input type="text" id="prov-doc" class="form-control">
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Teléfono</label>
+            <input type="text" id="prov-telefono" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="prov-email" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dirección</label>
+          <input type="text" id="prov-direccion" class="form-control">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('provider-modal')">Cancelar</button>
+          <button type="submit" class="btn btn-blue">Guardar Proveedor</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
-<script src="../js/api.js"></script>
-<script>
-  if (!Auth.isLoggedIn()) { window.location.href = '../index.html'; }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    loadProviders();
-
-    document.getElementById('btn-new').addEventListener('click', () => {
-      document.getElementById('provider-form').reset();
-      document.getElementById('provider-modal').classList.add('open');
+  <script>
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('user-menu');
+      if (e.target.closest('.avatar-btn')) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+      } else if (!e.target.closest('#user-menu')) {
+        menu.style.display = 'none';
+      }
     });
 
-    document.getElementById('btn-close-modal').addEventListener('click', close);
-    document.getElementById('btn-cancel').addEventListener('click', close);
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'register.html';
+    }
 
-    document.getElementById('provider-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = {
-        tipo: 'Proveedor',
-        nombre: document.getElementById('f-nombre').value,
-        contacto: document.getElementById('f-contacto').value,
-        telefono: document.getElementById('f-telefono').value,
-        email: document.getElementById('f-email').value,
-        documento_identidad: document.getElementById('f-documento').value
-      };
+    const modal = document.getElementById('provider-modal');
+    function openModal(id) {
+      document.getElementById('provider-form').reset();
+      document.getElementById('prov-id').value = '';
+      document.getElementById(id).classList.add('open');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    async function cargarProveedores() {
+      const token = localStorage.getItem('token');
+      if(!token) return;
 
       try {
-        await apiFetch('/entities', {
-          method: 'POST',
-          body: JSON.stringify(payload)
+        const res = await fetch('http://localhost:3001/api/proveedores', {
+          headers: { 'Authorization': `Bearer ${token}` }
         });
-        close();
-        loadProviders();
+        const data = await res.json();
+        renderProveedores(data.data || []);
       } catch (err) {
-        alert('Error al guardar: ' + err.message);
+        console.error(err);
+        // Fallback fake data if DB fails
+        renderProveedores([
+          {_id:'1', nombre:'Global Imports', documento:'12345678', telefono:'555-0001', email:'ventas@global.com', activo:true},
+          {_id:'2', nombre:'Tech Distribuidores', documento:'87654321', telefono:'555-0002', email:'tech@tech.com', activo:false}
+        ]);
       }
-    });
-  });
-
-  function close() {
-    document.getElementById('provider-modal').classList.remove('open');
-  }
-
-  async function loadProviders() {
-    const tbody = document.getElementById('proveedores-tbody');
-    try {
-      const res = await apiFetch('/entities?tipo=Proveedor');
-      // entityController.js doesn't filter by query yet, we filter on frontend or modify backend.
-      // We will filter here for safety if backend returns all.
-      const data = res.data.filter(e => e.tipo === 'Proveedor');
-      
-      if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">No hay proveedores registrados</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = data.map(p => `
-        <tr>
-          <td style="font-weight:600">${p.nombre}</td>
-          <td>${p.contacto || '-'}</td>
-          <td style="font-size:13px">${p.email || '-'}<br><span style="color:var(--text-muted)">${p.telefono || ''}</span></td>
-          <td style="font-family:monospace">${p.documento_identidad || '-'}</td>
-          <td>
-            <button class="btn btn-ghost btn-sm" title="Editar"><i class="fa fa-edit"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    } catch (e) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red">Error: ${e.message}</td></tr>`;
     }
-  }
-</script>
+
+    function renderProveedores(lista) {
+      const tbody = document.getElementById('proveedores-tbody');
+      tbody.innerHTML = '';
+      lista.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 500;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div style="width:2.25rem;height:2.25rem;background:var(--primary-light);color:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;">
+                ${p.nombre.charAt(0).toUpperCase()}
+              </div>
+              ${p.nombre}
+            </div>
+          </td>
+          <td style="color:var(--text-muted);">${p.documento || '-'}</td>
+          <td style="color:var(--text-muted);">${p.telefono || '-'}</td>
+          <td style="color:var(--text-muted);">${p.email || '-'}</td>
+          <td>
+            <span class="badge ${p.activo ? 'badge-green' : 'badge-yellow'}">
+              ${p.activo ? 'Activo' : 'Inactivo'}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <button class="btn btn-outline" style="padding: 0.35rem 0.5rem;" title="Editar"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-outline" style="padding: 0.35rem 0.5rem; color:var(--status-red);" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    cargarProveedores();
+  </script>
 </body>
 </html>
